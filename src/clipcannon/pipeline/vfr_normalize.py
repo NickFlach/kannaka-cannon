@@ -1,4 +1,4 @@
-"""VFR-to-CFR normalization pipeline stage for ClipCannon.
+"""VFR-to-CFR normalization pipeline stage for Kannaka Cannon.
 
 Detects if the source video has variable frame rate and converts
 it to constant frame rate using ffmpeg. Selects the nearest standard
@@ -164,7 +164,7 @@ async def run_vfr_normalize(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

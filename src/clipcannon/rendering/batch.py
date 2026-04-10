@@ -1,4 +1,4 @@
-"""Batch rendering with concurrency control for ClipCannon.
+"""Batch rendering with concurrency control for Kannaka Cannon.
 
 Renders multiple EDLs concurrently using an asyncio semaphore
 to limit the number of parallel FFmpeg/NVENC sessions.
@@ -38,7 +38,7 @@ async def render_batch(
         edl_list: List of EDLs to render.
         project_dir: Path to the project directory.
         db_path: Path to the project SQLite database.
-        config: ClipCannon configuration instance.
+        config: Kannaka Cannon configuration instance.
         max_concurrent: Maximum concurrent renders. Defaults to
             config.rendering.max_parallel_renders if not specified.
 

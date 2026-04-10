@@ -1,4 +1,4 @@
-"""WavLM speaker diarization pipeline stage for ClipCannon.
+"""WavLM speaker diarization pipeline stage for Kannaka Cannon.
 
 Uses Silero VAD for speech segment detection, then extracts speaker
 embeddings using WavLM (microsoft/wavlm-base-plus-sv) and clusters
@@ -325,7 +325,7 @@ async def run_speaker_embed(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

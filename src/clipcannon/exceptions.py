@@ -1,13 +1,13 @@
-"""Custom exception hierarchy for ClipCannon.
+"""Custom exception hierarchy for Kannaka Cannon.
 
-All ClipCannon-specific exceptions inherit from ClipCannonError,
+All Kannaka Cannon-specific exceptions inherit from ClipCannonError,
 enabling callers to catch the base class for broad handling or
 specific subclasses for targeted recovery.
 """
 
 
 class ClipCannonError(Exception):
-    """Base exception for all ClipCannon errors.
+    """Base exception for all Kannaka Cannon errors.
 
     Attributes:
         message: Human-readable error description.

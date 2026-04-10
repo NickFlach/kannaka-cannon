@@ -1,4 +1,4 @@
-"""Voice cloning MCP tool dispatch for ClipCannon.
+"""Voice cloning MCP tool dispatch for Kannaka Cannon.
 
 Handles dispatch for voice data preparation and voice profile
 management tools.

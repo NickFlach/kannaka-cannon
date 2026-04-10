@@ -1,4 +1,4 @@
-"""Provenance MCP tools for ClipCannon.
+"""Provenance MCP tools for Kannaka Cannon.
 
 Provides tools for verifying provenance chains, querying provenance
 records, walking chains, and viewing timelines.

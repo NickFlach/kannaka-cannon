@@ -1,4 +1,4 @@
-"""Quality assessment pipeline stage for ClipCannon.
+"""Quality assessment pipeline stage for Kannaka Cannon.
 
 Uses pyiqa BRISQUE scoring for GPU-accelerated image quality assessment.
 Falls back to Laplacian variance blur detection when pyiqa is unavailable.
@@ -278,7 +278,7 @@ async def run_quality(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

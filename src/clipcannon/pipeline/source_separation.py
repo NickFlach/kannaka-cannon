@@ -1,4 +1,4 @@
-"""HTDemucs source separation pipeline stage for ClipCannon.
+"""HTDemucs source separation pipeline stage for Kannaka Cannon.
 
 Separates the audio into four stems (vocals, drums, bass, other)
 using Meta's HTDemucs model. This is an OPTIONAL stage -- if it
@@ -167,7 +167,7 @@ async def run_source_separation(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

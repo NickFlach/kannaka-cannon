@@ -1,4 +1,4 @@
-"""SHA-256 hashing utilities for ClipCannon provenance tracking.
+"""SHA-256 hashing utilities for Kannaka Cannon provenance tracking.
 
 Provides streaming file hashing (safe for >10GB files), byte/string hashing,
 table content hashing, and hash verification. All functions raise

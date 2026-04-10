@@ -1,4 +1,4 @@
-"""Understanding MCP tools for ClipCannon.
+"""Understanding MCP tools for Kannaka Cannon.
 
 Provides ingest, VUD summary, analytics, and transcript tools. Shared
 helpers (_error, _db_path, etc.) are used by understanding_visual.py
@@ -96,7 +96,7 @@ async def clipcannon_ingest(
     try:
         config = ClipCannonConfig.load()
     except ClipCannonError:
-        return _error("CONFIG_ERROR", "Failed to load ClipCannon configuration")
+        return _error("CONFIG_ERROR", "Failed to load Kannaka Cannon configuration")
 
     from clipcannon.pipeline.registry import build_pipeline
 

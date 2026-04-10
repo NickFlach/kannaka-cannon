@@ -1,4 +1,4 @@
-"""Caption generation for ClipCannon EDL rendering.
+"""Caption generation for Kannaka Cannon EDL rendering.
 
 Converts WhisperX word-level timestamps into display-ready caption
 chunks. Delegates ASS/drawtext rendering to caption_render module.

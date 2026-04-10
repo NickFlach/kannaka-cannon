@@ -1,4 +1,4 @@
-"""Avatar/lip-sync MCP tool dispatch for ClipCannon.
+"""Avatar/lip-sync MCP tool dispatch for Kannaka Cannon.
 
 Handles dispatch for lip-sync video generation and webcam extraction tools.
 """

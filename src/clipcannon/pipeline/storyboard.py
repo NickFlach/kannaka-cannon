@@ -1,4 +1,4 @@
-"""Storyboard grid generation pipeline stage for ClipCannon.
+"""Storyboard grid generation pipeline stage for Kannaka Cannon.
 
 Selects up to 720 frames at adaptive intervals, groups them into
 3x3 grids (9 frames per grid), and generates composite JPEG images
@@ -250,7 +250,7 @@ async def run_storyboard(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

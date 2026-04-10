@@ -1,4 +1,4 @@
-"""Tool definitions for ClipCannon discovery MCP tools.
+"""Tool definitions for Kannaka Cannon discovery MCP tools.
 
 Separates the JSON schema tool definitions from the implementation.
 These tools help find the best moments, scenes, and cut points

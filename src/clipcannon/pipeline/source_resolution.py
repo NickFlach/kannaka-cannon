@@ -1,4 +1,4 @@
-"""Source file resolution for ClipCannon pipeline stages.
+"""Source file resolution for Kannaka Cannon pipeline stages.
 
 Determines which video file to use as the source for processing:
 the original file or the VFR-normalized CFR version.

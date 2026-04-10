@@ -1,4 +1,4 @@
-"""MCP tool definitions for ClipCannon.
+"""MCP tool definitions for Kannaka Cannon.
 
 Registers all tool modules and provides a unified registration function
 for the MCP server. Each tool module exposes a list of tool definitions

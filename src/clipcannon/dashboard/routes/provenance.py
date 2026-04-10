@@ -1,4 +1,4 @@
-"""Provenance chain routes for the ClipCannon dashboard.
+"""Provenance chain routes for the Kannaka Cannon dashboard.
 
 Provides endpoints to view provenance records, verify chain integrity,
 and display timeline views for project provenance chains.

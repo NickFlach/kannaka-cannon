@@ -1,4 +1,4 @@
-"""Database schema for ClipCannon project databases.
+"""Database schema for Kannaka Cannon project databases.
 
 Defines all tables from Phase1_Architecture.md Section 2.2, including
 core tables, vector tables (sqlite-vec), and indexes. Provides functions

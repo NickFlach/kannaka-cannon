@@ -1,4 +1,4 @@
-"""Rendering MCP tools for ClipCannon.
+"""Rendering MCP tools for Kannaka Cannon.
 
 Provides tools for rendering edits to video files, checking render
 status, and batch rendering multiple edits concurrently. Each render

@@ -1,4 +1,4 @@
-"""HMAC-SHA256 balance integrity verification for ClipCannon.
+"""HMAC-SHA256 balance integrity verification for Kannaka Cannon.
 
 Provides machine-derived HMAC signing and verification for credit balances.
 On tamper detection, raises BillingError with BALANCE_TAMPERED code and logs

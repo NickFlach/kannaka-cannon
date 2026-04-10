@@ -109,7 +109,7 @@ class MultiVoiceSynth:
     def load_voice_from_profile(
         self, profile_name: str, ref_audio_override: Path | None = None,
     ) -> None:
-        """Load a voice from the ClipCannon voice profiles database.
+        """Load a voice from the Kannaka Cannon voice profiles database.
 
         Automatically selects the best reference clip and transcribes it.
         For best results, provide a real mic recording via ref_audio_override

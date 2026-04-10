@@ -23,7 +23,7 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 _MUSICGEN_SR = 32000  # MusicGen native sample rate
-_OUTPUT_SR = 44100  # ClipCannon pipeline standard
+_OUTPUT_SR = 44100  # Kannaka Cannon pipeline standard
 _MAX_CHUNK_S = 30.0  # Max single-pass duration
 _OVERLAP_S = 5.0  # Overlap between chunks for crossfade
 _VALID_SIZES = frozenset({"small", "medium", "large"})

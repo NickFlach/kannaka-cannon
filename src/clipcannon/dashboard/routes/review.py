@@ -1,4 +1,4 @@
-"""Batch review workflow API routes for the ClipCannon dashboard.
+"""Batch review workflow API routes for the Kannaka Cannon dashboard.
 
 Provides endpoints for batch review of rendered edits, including
 a review queue, batch approve/reject operations, and review statistics.

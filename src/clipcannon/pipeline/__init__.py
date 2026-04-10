@@ -1,4 +1,4 @@
-"""Pipeline orchestration and stage definitions for ClipCannon.
+"""Pipeline orchestration and stage definitions for Kannaka Cannon.
 
 Public API:
     - PipelineOrchestrator: DAG-based pipeline runner

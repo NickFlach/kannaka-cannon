@@ -1,4 +1,4 @@
-"""FFmpeg command building for ClipCannon rendering.
+"""FFmpeg command building for Kannaka Cannon rendering.
 
 Constructs FFmpeg commands for single-segment and multi-segment EDLs
 with support for transitions, crop, scale, speed, subtitle filters,

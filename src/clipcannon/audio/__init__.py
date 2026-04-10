@@ -1,4 +1,4 @@
-"""Audio generation engine for ClipCannon.
+"""Audio generation engine for Kannaka Cannon.
 
 Provides AI music generation, MIDI composition, programmatic sound
 effects, audio mixing with speech-aware ducking, and effects

@@ -1,4 +1,4 @@
-"""Feedback intent parser for ClipCannon iterative editing.
+"""Feedback intent parser for Kannaka Cannon iterative editing.
 
 Translates natural language video feedback into structured EDL
 modifications. Uses pattern matching (regex + keyword detection)

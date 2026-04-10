@@ -1,4 +1,4 @@
-"""Content search MCP tool for ClipCannon.
+"""Content search MCP tool for Kannaka Cannon.
 
 Provides semantic (vector KNN) and text (SQL LIKE) search across
 transcript segments in a project database.

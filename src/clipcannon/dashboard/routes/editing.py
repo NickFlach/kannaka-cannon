@@ -1,4 +1,4 @@
-"""Edit management API routes for the ClipCannon dashboard."""
+"""Edit management API routes for the Kannaka Cannon dashboard."""
 
 from __future__ import annotations
 

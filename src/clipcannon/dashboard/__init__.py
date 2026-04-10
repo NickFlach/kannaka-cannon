@@ -1,4 +1,4 @@
-"""Dashboard web UI for ClipCannon.
+"""Dashboard web UI for Kannaka Cannon.
 
 Provides a FastAPI-based web dashboard with JSON API endpoints
 for credits, projects, provenance, and system health. Serves a

@@ -1,4 +1,4 @@
-"""Editing package for ClipCannon Phase 2.
+"""Editing package for Kannaka Cannon Phase 2.
 
 Provides EDL format models, caption generation, smart cropping,
 and change impact classification for the video editing and

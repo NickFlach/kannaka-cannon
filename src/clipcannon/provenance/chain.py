@@ -1,4 +1,4 @@
-"""Provenance hash chain computation and verification for ClipCannon.
+"""Provenance hash chain computation and verification for Kannaka Cannon.
 
 Implements a tamper-evident hash chain where each provenance record's
 chain_hash depends on its parent's chain_hash and its own content fields.

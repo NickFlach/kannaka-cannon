@@ -1,4 +1,4 @@
-"""Project management routes for the ClipCannon dashboard.
+"""Project management routes for the Kannaka Cannon dashboard.
 
 Provides endpoints to list projects, get project details, and
 check pipeline processing status.

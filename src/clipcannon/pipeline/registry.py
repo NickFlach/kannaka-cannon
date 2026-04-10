@@ -1,4 +1,4 @@
-"""Pipeline stage registry for ClipCannon.
+"""Pipeline stage registry for Kannaka Cannon.
 
 Builds and registers all pipeline stages with correct DAG dependencies
 so the orchestrator can resolve execution order via topological sort.
@@ -161,7 +161,7 @@ def build_pipeline(config: ClipCannonConfig) -> PipelineOrchestrator:
     so the orchestrator can resolve and execute them.
 
     Args:
-        config: ClipCannon configuration instance.
+        config: Kannaka Cannon configuration instance.
 
     Returns:
         Fully configured PipelineOrchestrator.

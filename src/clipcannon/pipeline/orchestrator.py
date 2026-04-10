@@ -1,4 +1,4 @@
-"""DAG-based pipeline orchestrator for ClipCannon.
+"""DAG-based pipeline orchestrator for Kannaka Cannon.
 
 Resolves stage dependencies into an execution order, runs stages
 respecting the dependency graph, tracks timing, and writes
@@ -96,7 +96,7 @@ _topological_sort = topological_sort
 
 
 class PipelineOrchestrator:
-    """DAG-based pipeline runner for ClipCannon video analysis.
+    """DAG-based pipeline runner for Kannaka Cannon video analysis.
 
     Resolves stage dependencies via topological sort, executes
     stages level-by-level with asyncio.gather for concurrency
@@ -104,14 +104,14 @@ class PipelineOrchestrator:
 
     Attributes:
         stages: Registered pipeline stages.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
     """
 
     def __init__(self, config: ClipCannonConfig) -> None:
         """Initialize the orchestrator.
 
         Args:
-            config: ClipCannon configuration instance.
+            config: Kannaka Cannon configuration instance.
         """
         self.stages: list[PipelineStage] = []
         self.config = config

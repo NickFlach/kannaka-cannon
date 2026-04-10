@@ -1,4 +1,4 @@
-"""Tool definitions for ClipCannon avatar/lip-sync MCP tools."""
+"""Tool definitions for Kannaka Cannon avatar/lip-sync MCP tools."""
 
 from __future__ import annotations
 

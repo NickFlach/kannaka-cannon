@@ -1,4 +1,4 @@
-"""Billing MCP tools for ClipCannon.
+"""Billing MCP tools for Kannaka Cannon.
 
 Provides four MCP tools for credit management:
   - clipcannon_credits_balance: Current balance and spending info

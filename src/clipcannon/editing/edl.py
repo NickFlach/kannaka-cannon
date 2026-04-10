@@ -1,4 +1,4 @@
-"""Edit Decision List (EDL) models and validation for ClipCannon.
+"""Edit Decision List (EDL) models and validation for Kannaka Cannon.
 
 Defines Pydantic models for the complete EDL schema -- segments,
 captions, crop, audio, overlays, metadata, and render settings.

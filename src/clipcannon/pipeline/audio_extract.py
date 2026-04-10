@@ -1,4 +1,4 @@
-"""Audio extraction pipeline stage for ClipCannon.
+"""Audio extraction pipeline stage for Kannaka Cannon.
 
 Extracts two WAV files from the source video:
   - audio_16k.wav: 16kHz mono for speech models (Whisper, etc.)
@@ -94,7 +94,7 @@ async def run_audio_extract(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

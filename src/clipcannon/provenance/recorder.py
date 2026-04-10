@@ -1,4 +1,4 @@
-"""Provenance record creation and retrieval for ClipCannon.
+"""Provenance record creation and retrieval for Kannaka Cannon.
 
 Provides pydantic models for structured provenance data and functions
 to write and query provenance records in the project database. Each

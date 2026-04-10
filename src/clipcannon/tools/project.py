@@ -1,4 +1,4 @@
-"""Project management MCP tools for ClipCannon.
+"""Project management MCP tools for Kannaka Cannon.
 
 Provides tools for creating, opening, listing, inspecting, and deleting
 video analysis projects. Each project gets its own directory structure
@@ -82,7 +82,7 @@ async def clipcannon_project_create(
     name: str,
     source_video_path: str,
 ) -> dict[str, object]:
-    """Create a new ClipCannon project from a source video.
+    """Create a new Kannaka Cannon project from a source video.
 
     Validates the source file, extracts metadata via ffprobe, computes
     a SHA-256 hash, creates the project directory and database, and

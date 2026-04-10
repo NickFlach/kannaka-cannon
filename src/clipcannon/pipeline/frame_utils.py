@@ -1,4 +1,4 @@
-"""Shared frame utilities for ClipCannon pipeline stages.
+"""Shared frame utilities for Kannaka Cannon pipeline stages.
 
 Common helpers for working with extracted frame files.
 """

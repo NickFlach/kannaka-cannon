@@ -1,4 +1,4 @@
-"""Credit management routes for the ClipCannon dashboard.
+"""Credit management routes for the Kannaka Cannon dashboard.
 
 Provides endpoints to check credit balance, view transaction history,
 add credits in dev mode, and list available credit packages.

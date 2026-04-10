@@ -1,4 +1,4 @@
-"""Video probing and metadata extraction for ClipCannon.
+"""Video probing and metadata extraction for Kannaka Cannon.
 
 Provides FFprobe-based metadata extraction and VFR detection
 for use by the project management tools.
@@ -52,7 +52,7 @@ def run_ffprobe(video_path: str) -> dict[str, object]:
             )
         return json.loads(result.stdout)
     except FileNotFoundError as exc:
-        raise ClipCannonError("ffprobe not found. Install ffmpeg to use ClipCannon.") from exc
+        raise ClipCannonError("ffprobe not found. Install ffmpeg to use Kannaka Cannon.") from exc
     except json.JSONDecodeError as exc:
         raise ClipCannonError(f"Failed to parse ffprobe output: {exc}") from exc
     except subprocess.TimeoutExpired as exc:

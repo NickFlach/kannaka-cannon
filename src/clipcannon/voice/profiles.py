@@ -1,4 +1,4 @@
-"""Voice profile CRUD operations for ClipCannon.
+"""Voice profile CRUD operations for Kannaka Cannon.
 
 Manages voice profiles stored in a central voice_profiles table.
 Each profile tracks model path, training status, and thresholds.

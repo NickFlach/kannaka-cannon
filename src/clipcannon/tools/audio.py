@@ -1,4 +1,4 @@
-"""Audio generation MCP tools for ClipCannon."""
+"""Audio generation MCP tools for Kannaka Cannon."""
 
 from __future__ import annotations
 

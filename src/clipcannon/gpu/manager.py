@@ -1,4 +1,4 @@
-"""GPU model lifecycle manager for ClipCannon.
+"""GPU model lifecycle manager for Kannaka Cannon.
 
 Manages loading and unloading ML models based on available VRAM,
 reports GPU health, and determines whether models can run concurrently

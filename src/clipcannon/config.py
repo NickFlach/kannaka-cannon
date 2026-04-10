@@ -1,4 +1,4 @@
-"""Configuration management for ClipCannon.
+"""Configuration management for Kannaka Cannon.
 
 Loads configuration from ~/.clipcannon/config.json with fallback to
 bundled defaults. Supports dot-notation access for nested keys and

@@ -1,4 +1,4 @@
-"""Smart cropping and layout for ClipCannon EDL rendering.
+"""Smart cropping and layout for Kannaka Cannon EDL rendering.
 
 Supports three layout modes for vertical video:
 - crop: Single face-centered crop (default). Good for talking-head.

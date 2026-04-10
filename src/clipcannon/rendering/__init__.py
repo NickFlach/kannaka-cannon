@@ -1,4 +1,4 @@
-"""Rendering package for ClipCannon Phase 2.
+"""Rendering package for Kannaka Cannon Phase 2.
 
 Provides the rendering engine, encoding profiles, batch rendering,
 and thumbnail generation for converting EDLs into platform-ready

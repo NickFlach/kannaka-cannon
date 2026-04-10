@@ -1,4 +1,4 @@
-"""Full autonomous video generation orchestrator for ClipCannon.
+"""Full autonomous video generation orchestrator for Kannaka Cannon.
 
 End-to-end pipeline: Script --> Voice Clone --> Lip Sync --> Output.
 Optionally extracts webcam from an ingested project for the driver video.

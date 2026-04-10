@@ -1,4 +1,4 @@
-"""HTTP client for the ClipCannon license server.
+"""HTTP client for the Kannaka Cannon license server.
 
 Provides an async interface to the local license server running on
 port 3100. Used by MCP tools to charge credits, issue refunds, and
@@ -74,7 +74,7 @@ class TransactionRecord(BaseModel):
 
 
 class LicenseClient:
-    """Async client for the local ClipCannon license server.
+    """Async client for the local Kannaka Cannon license server.
 
     Communicates with the license server HTTP API to manage credit
     balances. All methods handle connection errors gracefully, returning

@@ -1,4 +1,4 @@
-"""Finalize pipeline stage for ClipCannon.
+"""Finalize pipeline stage for Kannaka Cannon.
 
 Updates stream_status for all tracked streams, verifies the provenance
 chain, sets the project status to 'ready' or 'error', and cleans up
@@ -302,7 +302,7 @@ async def run_finalize(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

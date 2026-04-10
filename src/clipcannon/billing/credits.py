@@ -1,4 +1,4 @@
-"""Credit rate system for ClipCannon billing.
+"""Credit rate system for Kannaka Cannon billing.
 
 Defines credit costs per operation and provides estimation and spending
 limit validation. Phase 1 only uses the "analyze" operation at 10 credits.

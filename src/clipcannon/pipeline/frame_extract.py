@@ -1,4 +1,4 @@
-"""Frame extraction pipeline stage for ClipCannon.
+"""Frame extraction pipeline stage for Kannaka Cannon.
 
 Extracts frames at 2fps from the source video using ffmpeg.
 Attempts GPU-accelerated decoding (NVDEC) first, falls back
@@ -143,7 +143,7 @@ async def run_frame_extract(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

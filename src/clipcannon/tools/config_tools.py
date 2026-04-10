@@ -1,4 +1,4 @@
-"""Configuration MCP tools for ClipCannon.
+"""Configuration MCP tools for Kannaka Cannon.
 
 Provides tools for getting, setting, and listing configuration values
 using dot-notation keys (e.g., "processing.whisper_model").
@@ -105,7 +105,7 @@ CONFIG_TOOL_DEFINITIONS: list[Tool] = [
     Tool(
         name="clipcannon_config_get",
         description=(
-            "Get a ClipCannon configuration value by dot-notation key"
+            "Get a Kannaka Cannon configuration value by dot-notation key"
             " (e.g., 'processing.whisper_model', 'gpu.device')."
         ),
         inputSchema={
@@ -122,7 +122,7 @@ CONFIG_TOOL_DEFINITIONS: list[Tool] = [
     Tool(
         name="clipcannon_config_set",
         description=(
-            "Set a ClipCannon configuration value and save to disk."
+            "Set a Kannaka Cannon configuration value and save to disk."
             " Value is validated against the config schema."
         ),
         inputSchema={
@@ -141,7 +141,7 @@ CONFIG_TOOL_DEFINITIONS: list[Tool] = [
     ),
     Tool(
         name="clipcannon_config_list",
-        description="List all ClipCannon configuration values with their current settings.",
+        description="List all Kannaka Cannon configuration values with their current settings.",
         inputSchema={
             "type": "object",
             "properties": {},

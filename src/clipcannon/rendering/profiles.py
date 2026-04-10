@@ -1,4 +1,4 @@
-"""Platform encoding profiles for ClipCannon rendering.
+"""Platform encoding profiles for Kannaka Cannon rendering.
 
 Defines FFmpeg encoding parameters for each supported platform.
 Each profile specifies resolution, codec, bitrate, and audio settings.

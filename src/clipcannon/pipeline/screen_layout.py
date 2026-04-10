@@ -1,4 +1,4 @@
-"""Screen layout analysis for ClipCannon video editing.
+"""Screen layout analysis for Kannaka Cannon video editing.
 
 Detects content regions, webcam PIP overlays, and mouse cursor
 positions in screen recording frames. Uses Pillow + NumPy only

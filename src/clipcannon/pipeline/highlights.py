@@ -1,4 +1,4 @@
-"""Multi-signal highlight scoring pipeline stage for ClipCannon.
+"""Multi-signal highlight scoring pipeline stage for Kannaka Cannon.
 
 Computes highlight scores for candidate time windows using a weighted
 combination of seven signals: emotion energy, reaction presence,
@@ -664,7 +664,7 @@ async def run_highlights(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

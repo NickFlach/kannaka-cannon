@@ -1,4 +1,4 @@
-"""SQLite connection manager for ClipCannon.
+"""SQLite connection manager for Kannaka Cannon.
 
 Every connection is configured with WAL journal mode, performance pragmas,
 and optionally loads the sqlite-vec extension for vector search.

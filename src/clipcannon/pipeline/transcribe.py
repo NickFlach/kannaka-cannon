@@ -1,4 +1,4 @@
-"""WhisperX transcription pipeline stage for ClipCannon.
+"""WhisperX transcription pipeline stage for Kannaka Cannon.
 
 Transcribes audio using WhisperX with wav2vec2 forced alignment
 for 20-50ms word-level precision. Falls back to faster-whisper
@@ -665,7 +665,7 @@ async def run_transcribe(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

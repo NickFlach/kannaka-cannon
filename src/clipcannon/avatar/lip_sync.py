@@ -1,4 +1,4 @@
-"""LatentSync 1.6 lip-sync pipeline for ClipCannon.
+"""LatentSync 1.6 lip-sync pipeline for Kannaka Cannon.
 
 Maps audio onto a driver video to produce a talking-head video
 where the speaker's lips match the audio content. Uses ByteDance's

@@ -1,4 +1,4 @@
-"""Tool definitions for ClipCannon rendering MCP tools.
+"""Tool definitions for Kannaka Cannon rendering MCP tools.
 
 Separates the JSON schema tool definitions from the implementation.
 """

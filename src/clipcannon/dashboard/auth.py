@@ -1,4 +1,4 @@
-"""Simplified authentication for the ClipCannon dashboard.
+"""Simplified authentication for the Kannaka Cannon dashboard.
 
 Phase 1 uses a simple JWT-based dev-mode authentication. A dev-login
 endpoint auto-authenticates without requiring email or password,

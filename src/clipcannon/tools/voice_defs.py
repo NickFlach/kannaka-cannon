@@ -1,4 +1,4 @@
-"""Tool definitions for ClipCannon voice cloning MCP tools.
+"""Tool definitions for Kannaka Cannon voice cloning MCP tools.
 
 Separates the JSON schema tool definitions from the implementation.
 """

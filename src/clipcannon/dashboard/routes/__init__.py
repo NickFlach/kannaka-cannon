@@ -1,4 +1,4 @@
-"""Dashboard route modules for ClipCannon.
+"""Dashboard route modules for Kannaka Cannon.
 
 Provides API routes for home, credits, projects, provenance,
 timeline, editing, and review.

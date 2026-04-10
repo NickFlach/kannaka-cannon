@@ -1,4 +1,4 @@
-"""Editing MCP tools for ClipCannon.
+"""Editing MCP tools for Kannaka Cannon.
 
 Provides tools for creating, modifying, and listing edit decision
 lists (EDLs). Each edit represents a planned output clip with segments,

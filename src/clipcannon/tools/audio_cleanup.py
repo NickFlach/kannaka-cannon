@@ -1,4 +1,4 @@
-"""Audio cleanup MCP tool for ClipCannon.
+"""Audio cleanup MCP tool for Kannaka Cannon.
 
 Separated from audio.py to keep the main audio tools module under 500 lines.
 """

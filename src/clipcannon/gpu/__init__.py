@@ -1,4 +1,4 @@
-"""GPU management for ClipCannon.
+"""GPU management for Kannaka Cannon.
 
 Provides auto-detection of GPU capabilities, precision selection,
 VRAM monitoring, and model lifecycle management.

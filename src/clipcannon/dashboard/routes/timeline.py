@@ -1,4 +1,4 @@
-"""Timeline and transcript API routes for the ClipCannon dashboard.
+"""Timeline and transcript API routes for the Kannaka Cannon dashboard.
 
 Provides endpoints for timeline visualization data (scenes, speakers,
 emotion curves, topics, highlights), transcript search, and enhanced

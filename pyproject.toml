@@ -3,14 +3,14 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "clipcannon"
+name = "kannaka-cannon"
 version = "0.1.0"
-description = "AI-powered video understanding and editing pipeline via MCP"
+description = "AI Video Intelligence -- powered by Holographic Resonance Memory. 22-stage analysis pipeline, 51 MCP tools, voice cloning, lip-sync avatars."
 readme = "README.md"
 license = "BSL-1.1"
 requires-python = ">=3.12"
 authors = [
-    { name = "ClipCannon Team" },
+    { name = "Kannaka Team" },
 ]
 
 dependencies = [

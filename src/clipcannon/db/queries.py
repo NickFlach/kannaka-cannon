@@ -1,4 +1,4 @@
-"""Query helpers for ClipCannon project databases.
+"""Query helpers for Kannaka Cannon project databases.
 
 Provides parameterized query execution, batch inserts, and transaction
 management to prevent SQL injection and simplify database operations.

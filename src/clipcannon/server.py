@@ -1,4 +1,4 @@
-"""ClipCannon MCP server entry point.
+"""Kannaka Cannon MCP server entry point.
 
 Provides the main() function used by the clipcannon console script
 defined in pyproject.toml. Initializes the MCP server with tool
@@ -72,7 +72,7 @@ def create_server() -> Server:
         Configured MCP Server instance.
     """
     server = Server(
-        name="ClipCannon",
+        name="Kannaka Cannon",
         version=__version__,
     )
 
@@ -157,7 +157,7 @@ def create_server() -> Server:
         return contents
 
     logger.info(
-        "ClipCannon MCP server created: %d tools registered",
+        "Kannaka Cannon MCP server created: %d tools registered",
         len(ALL_TOOL_DEFINITIONS),
     )
     return server
@@ -169,18 +169,18 @@ async def run_stdio() -> None:
     init_options = server.create_initialization_options()
 
     async with stdio_server() as (read_stream, write_stream):
-        logger.info("ClipCannon MCP server v%s running on stdio", __version__)
+        logger.info("Kannaka Cannon MCP server v%s running on stdio", __version__)
         await server.run(read_stream, write_stream, init_options)
 
 
 def main() -> None:
-    """Start the ClipCannon MCP server.
+    """Start the Kannaka Cannon MCP server.
 
     Entry point for the ``clipcannon`` console script. Configures
     structured logging and starts the server on stdio transport.
     """
     _setup_logging()
-    logger.info("ClipCannon MCP Server v%s starting...", __version__)
+    logger.info("Kannaka Cannon MCP Server v%s starting...", __version__)
 
     try:
         asyncio.run(run_stdio())

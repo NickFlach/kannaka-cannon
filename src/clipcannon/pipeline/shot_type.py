@@ -1,4 +1,4 @@
-"""Shot type classification pipeline stage for ClipCannon.
+"""Shot type classification pipeline stage for Kannaka Cannon.
 
 Uses SigLIP zero-shot classification to identify shot types from
 scene key frames. Classifies into: extreme_closeup, closeup, medium,
@@ -152,7 +152,7 @@ async def run_shot_type(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

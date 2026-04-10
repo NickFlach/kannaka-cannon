@@ -1,4 +1,4 @@
-"""Tool definitions for ClipCannon video generation orchestrator."""
+"""Tool definitions for Kannaka Cannon video generation orchestrator."""
 
 from __future__ import annotations
 

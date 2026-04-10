@@ -1,4 +1,4 @@
-"""Thumbnail generation for ClipCannon rendered clips.
+"""Thumbnail generation for Kannaka Cannon rendered clips.
 
 Extracts a single frame at a given timestamp from a video file,
 optionally applies a crop region, and saves as JPEG at quality 95.

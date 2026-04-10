@@ -1,4 +1,4 @@
-"""Audio tool definitions for ClipCannon MCP server.
+"""Audio tool definitions for Kannaka Cannon MCP server.
 
 Separated from audio.py to keep the implementation module under 500 lines.
 Contains AUDIO_TOOL_DEFINITIONS used by the MCP tool registry.

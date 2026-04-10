@@ -1,4 +1,4 @@
-"""ClipCannon dashboard web application.
+"""Kannaka Cannon dashboard web application.
 
 FastAPI application serving the dashboard UI on port 3200. Provides
 JSON API endpoints for credits, projects, provenance, and system health,
@@ -43,13 +43,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         Control during the application lifetime.
     """
     logger.info(
-        "ClipCannon Dashboard v%s starting on port %d (dev_mode=%s)",
+        "Kannaka Cannon Dashboard v%s starting on port %d (dev_mode=%s)",
         __version__,
         DEFAULT_PORT,
         is_dev_mode(),
     )
     yield
-    logger.info("ClipCannon Dashboard shutting down.")
+    logger.info("Kannaka Cannon Dashboard shutting down.")
 
 
 def create_app() -> FastAPI:
@@ -59,9 +59,9 @@ def create_app() -> FastAPI:
         Configured FastAPI application with all routes and middleware.
     """
     app = FastAPI(
-        title="ClipCannon Dashboard",
+        title="Kannaka Cannon Dashboard",
         version=__version__,
-        description="ClipCannon video pipeline dashboard and API",
+        description="Kannaka Cannon video pipeline dashboard and API",
         lifespan=lifespan,
     )
 
@@ -159,7 +159,7 @@ def main() -> None:
     )
 
     port = int(os.environ.get("CLIPCANNON_DASHBOARD_PORT", str(DEFAULT_PORT)))
-    logger.info("Starting ClipCannon Dashboard on port %d", port)
+    logger.info("Starting Kannaka Cannon Dashboard on port %d", port)
 
     uvicorn.run(
         "clipcannon.dashboard.app:create_app",

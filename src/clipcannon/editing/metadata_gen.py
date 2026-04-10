@@ -1,4 +1,4 @@
-"""Metadata generation for ClipCannon edits.
+"""Metadata generation for Kannaka Cannon edits.
 
 Generates platform-specific titles, descriptions, hashtags, and
 thumbnail timestamps from VUD data (topics, highlights, transcript).

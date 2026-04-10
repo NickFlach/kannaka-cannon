@@ -1,4 +1,4 @@
-"""Acoustic analysis and beat detection pipeline stage for ClipCannon.
+"""Acoustic analysis and beat detection pipeline stage for Kannaka Cannon.
 
 Computes RMS energy envelope, silence gaps, spectral flatness for
 music/speech discrimination, and beat positions. Uses numpy/scipy for
@@ -377,7 +377,7 @@ async def run_acoustic(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

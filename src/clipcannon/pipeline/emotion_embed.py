@@ -1,4 +1,4 @@
-"""Wav2Vec2 emotion and energy analysis pipeline stage for ClipCannon.
+"""Wav2Vec2 emotion and energy analysis pipeline stage for Kannaka Cannon.
 
 Segments audio into 5-second windows with 2.5-second stride and computes
 energy, arousal, and valence from model hidden states. Falls back to
@@ -391,7 +391,7 @@ async def run_emotion_embed(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

@@ -1,4 +1,4 @@
-"""Caption rendering output for ClipCannon.
+"""Caption rendering output for Kannaka Cannon.
 
 Generates ASS subtitle files and FFmpeg drawtext filter strings
 from caption chunks. Supports four styles: bold_centered,
@@ -312,7 +312,7 @@ def generate_ass_file(
 
     lines: list[str] = [
         "[Script Info]",
-        "Title: ClipCannon Captions",
+        "Title: Kannaka Cannon Captions",
         "ScriptType: v4.00+",
         f"PlayResX: {resolution_w}",
         f"PlayResY: {resolution_h}",

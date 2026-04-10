@@ -1,4 +1,4 @@
-"""Smart music generation MCP tools for ClipCannon.
+"""Smart music generation MCP tools for Kannaka Cannon.
 
 Contains video-aware auto_music and description-based compose_music tools.
 Separated from audio.py to keep modules under 500 lines.

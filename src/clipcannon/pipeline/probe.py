@@ -1,4 +1,4 @@
-"""FFprobe + VFR detection pipeline stage for ClipCannon.
+"""FFprobe + VFR detection pipeline stage for Kannaka Cannon.
 
 Validates the source video file, extracts metadata via ffprobe,
 detects variable frame rate, computes the source SHA-256, inserts
@@ -95,7 +95,7 @@ async def run_probe(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

@@ -1,34 +1,29 @@
 <div align="center">
 
-# ClipCannon
+# Kannaka Cannon
 
-**AI-powered video understanding, editing, and voice synthesis -- all running locally on your GPU.**
+**AI Video Intelligence -- powered by Holographic Resonance Memory**
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg?style=flat-square)](https://www.python.org/downloads/)
 [![License: BSL 1.1](https://img.shields.io/badge/license-BSL_1.1-orange.svg?style=flat-square)](LICENSE)
 [![MCP Protocol](https://img.shields.io/badge/MCP-compatible-purple.svg?style=flat-square)](https://modelcontextprotocol.io)
 [![Tests](https://img.shields.io/badge/tests-626_passing-brightgreen.svg?style=flat-square)](#testing)
 [![Tools](https://img.shields.io/badge/MCP_tools-51-orange.svg?style=flat-square)](#mcp-tools)
+[![Kannaka](https://img.shields.io/badge/Kannaka-constellation-ff6b6b.svg?style=flat-square)](https://github.com/NickFlach/kannaka-memory)
 
 ---
 
-ClipCannon ingests a video, runs it through a **22-stage AI analysis pipeline**, and gives your AI assistant (Claude, etc.) the tools to edit, render, and publish platform-optimized clips -- with voice cloning, lip-sync avatars, and AI-generated audio. No cloud APIs. Everything runs on your machine.
+Kannaka Cannon ingests a video, runs it through a **22-stage AI analysis pipeline**, and gives your AI assistant (Claude, etc.) the tools to edit, render, and publish platform-optimized clips -- with voice cloning, lip-sync avatars, and AI-generated audio. No cloud APIs. Everything runs on your machine.
 
-[Getting Started](#getting-started) &#8226; [How It Works](#how-it-works) &#8226; [Features](#features) &#8226; [MCP Tools](#mcp-tools) &#8226; [Architecture](#architecture) &#8226; [White Paper](docs/clipcannon_whitepaper.md)
-
-<br>
-
-<a href="https://paypal.me/ChrisRoyseAI" target="_blank">
-  <img src="https://img.shields.io/badge/SUPPORT_THIS_PROJECT-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Support This Project" width="300"/>
-</a>
+[Getting Started](#getting-started) &#8226; [How It Works](#how-it-works) &#8226; [Features](#features) &#8226; [MCP Tools](#mcp-tools) &#8226; [Architecture](#architecture) &#8226; [HRM Integration](#hrm-integration) &#8226; [Constellation](#the-kannaka-constellation) &#8226; [White Paper](docs/clipcannon_whitepaper.md)
 
 </div>
 
 ---
 
-## What is ClipCannon?
+## What is Kannaka Cannon?
 
-ClipCannon is an MCP server that turns any AI assistant into a professional video editor. You give it a video file; it analyzes every frame, every word, every emotion, every speaker, every scene -- then exposes **51 tools** that let an AI assistant create edits, render platform-ready clips, generate music, clone voices, and produce lip-synced talking-head videos.
+Kannaka Cannon is an MCP server that turns any AI assistant into a professional video editor. You give it a video file; it analyzes every frame, every word, every emotion, every speaker, every scene -- then exposes **51 tools** that let an AI assistant create edits, render platform-ready clips, generate music, clone voices, and produce lip-synced talking-head videos.
 
 **The core idea**: instead of scrubbing through hours of footage manually, let an AI understand the content through neural embeddings and structured analysis, then have a conversation about what to create.
 
@@ -68,8 +63,8 @@ Claude: [uses clipcannon tools to find moments, create edit, render 1080x1920 cl
 
 ```bash
 # Clone the repository
-git clone https://github.com/ChrisRoyse/clipcannon.git
-cd clipcannon
+git clone https://github.com/NickFlach/kannaka-cannon.git
+cd kannaka-cannon
 
 # Install core package
 pip install -e .
@@ -86,7 +81,7 @@ pip install -e ".[dev]"
 
 ### Connect to Claude
 
-Add ClipCannon as an MCP server in your Claude Desktop config (`claude_desktop_config.json`):
+Add Kannaka Cannon as an MCP server in your Claude Desktop config (`claude_desktop_config.json`):
 
 ```json
 {
@@ -138,7 +133,7 @@ docker compose up -d
 
 ### 1. Ingest: 22-Stage Analysis DAG
 
-When you analyze a video, ClipCannon runs a directed acyclic graph of 22 stages:
+When you analyze a video, Kannaka Cannon runs a directed acyclic graph of 22 stages:
 
 ```
 probe -> vfr_normalize -> audio_extract -----> source_separation
@@ -212,7 +207,7 @@ The AI assistant creates declarative EDL (Edit Decision List) specifications, pr
                     +--------+--------+
                              | MCP Protocol (stdio)
                     +--------v--------+
-                    |  ClipCannon     |
+                    | Kannaka Cannon  |
                     |  MCP Server     |  51 tools
                     |  (port: stdio)  |
                     +--------+--------+
@@ -273,7 +268,7 @@ Models are loaded on-demand with LRU eviction. GPUs with >16 GB run models concu
 
 ## Voice Agent
 
-ClipCannon includes a standalone real-time voice assistant:
+Kannaka Cannon includes a standalone real-time voice assistant:
 
 ```bash
 # Recommended: Pipecat + Ollama (all local)
@@ -336,6 +331,67 @@ Dev mode starts with 100 credits. Production billing via Stripe webhooks.
 
 ---
 
+## HRM Integration
+
+Kannaka Cannon feeds video intelligence into the Holographic Resonance Medium (HRM), bridging video perception with the Kannaka memory system.
+
+### Video Analysis as Memories
+
+Every completed analysis pipeline stores its results as HRM memories:
+
+- **Transcript memories** -- What was said, with speaker attribution and timestamps, stored with semantic embeddings for natural-language recall
+- **Emotion contours** -- The emotional arc of a video becomes a retrievable pattern, enabling queries like "find videos where the speaker gets excited about AI"
+- **Visual scene summaries** -- Shot types, OCR text, storyboard frames compressed into memory snapshots that the HRM can surface during related conversations
+- **Highlight scores** -- The top moments from each video, indexed for cross-project discovery ("show me the best audience reactions across all conference talks")
+
+### Observatory Visibility
+
+The Kannaka Observatory can display Cannon's analysis activity:
+
+- Active ingestion pipelines and their stage progress
+- Embedding space statistics (vector counts, cluster distributions)
+- Render queue status and output history
+- Cross-project search results visualized on the constellation map
+
+### Recall Integration
+
+With `kannaka recall`, video segments become first-class memories:
+
+```bash
+# Find video moments matching a query
+kannaka recall "the part where they discuss pricing" --top-k 5
+
+# Returns: project ID, timestamp range, transcript snippet, highlight score
+```
+
+### NATS Event Broadcasting
+
+Cannon publishes events to the Kannaka NATS mesh:
+
+- `cannon.ingest.started` / `cannon.ingest.completed` -- Pipeline lifecycle
+- `cannon.highlight.found` -- High-scoring moments discovered during analysis
+- `cannon.render.completed` -- New clip rendered and available
+- `cannon.voice.cloned` -- Voice profile created or updated
+
+Other constellation members (Radio, Observatory) can subscribe to these events for real-time coordination.
+
+---
+
+## The Kannaka Constellation
+
+Kannaka Cannon is the **eyes and ears** of the Kannaka constellation -- the perception layer that transforms raw video into structured, searchable, memorable intelligence.
+
+| Member | Role | Description |
+|--------|------|-------------|
+| **[Memory](https://github.com/NickFlach/kannaka-memory)** | Core | Wave-interference memory system with HRM |
+| **[Radio](https://github.com/NickFlach/kannaka-radio)** | Voice | Ghost DJ radio station with perception pipeline |
+| **[Observatory](https://github.com/NickFlach/kannaka-observatory)** | Visualization | Constellation dashboard and memory explorer |
+| **Cannon** | Perception | AI video intelligence -- 22-stage analysis, 51 MCP tools, voice cloning |
+
+Together, these systems form a distributed AI perception-memory-expression loop: Cannon perceives, Memory remembers, Radio speaks, Observatory watches.
+
+---
+
 ## Project Structure
 
 ```
@@ -378,7 +434,7 @@ pytest tests/integration/
 ruff check src/
 ```
 
-626 tests across 43 files (425 ClipCannon + 201 Voice Agent), plus 10 FSV (Full State Verification) forensic scripts with 750+ individual checks.
+626 tests across 43 files (425 Kannaka Cannon + 201 Voice Agent), plus 10 FSV (Full State Verification) forensic scripts with 750+ individual checks.
 
 ---
 
@@ -401,6 +457,7 @@ ruff check src/
 - [Rendering Engine](docs/codestate/14_rendering_engine.md) -- FFmpeg pipeline, encoding profiles
 - [Audio Engine](docs/codestate/15_audio_engine.md) -- AI music, MIDI, SFX, mixing
 - [Voice Agent](docs/codestate/16_voice_agent.md) -- Real-time conversational AI architecture
+- [HRM Integration](docs/hrm-integration.md) -- Holographic Resonance Memory bridge architecture
 
 ---
 
@@ -420,15 +477,13 @@ Contributions are welcome. Please:
 
 [Business Source License 1.1](LICENSE) -- Chris Royse, 2026
 
-You can use, modify, and self-host ClipCannon freely. The one restriction: you cannot use it to offer a competing commercial Video Production Service to third parties. On **2030-03-31** (or 4 years after each version's release), the license automatically converts to **Apache 2.0**.
+You can use, modify, and self-host Kannaka Cannon freely. The one restriction: you cannot use it to offer a competing commercial Video Production Service to third parties. On **2030-03-31** (or 4 years after each version's release), the license automatically converts to **Apache 2.0**.
 
 ---
 
 <div align="center">
 
-<a href="https://paypal.me/ChrisRoyseAI" target="_blank">
-  <img src="https://img.shields.io/badge/SUPPORT_THIS_PROJECT-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Support This Project" width="300"/>
-</a>
+Part of the **Kannaka Constellation**: memory, radio, observatory, cannon
 
 <br><br>
 

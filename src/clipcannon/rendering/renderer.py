@@ -1,4 +1,4 @@
-"""Core rendering engine for ClipCannon.
+"""Core rendering engine for Kannaka Cannon.
 
 Translates an EDL (Edit Decision List) into FFmpeg commands and
 executes them as subprocesses. Handles source validation, caption
@@ -270,14 +270,14 @@ class RenderEngine:
     generation, crop computation, and provenance recording.
 
     Attributes:
-        config: ClipCannon configuration instance.
+        config: Kannaka Cannon configuration instance.
     """
 
     def __init__(self, config: ClipCannonConfig) -> None:
         """Initialize the render engine.
 
         Args:
-            config: ClipCannon configuration instance.
+            config: Kannaka Cannon configuration instance.
         """
         self.config = config
 

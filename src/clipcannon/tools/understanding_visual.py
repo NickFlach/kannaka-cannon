@@ -1,4 +1,4 @@
-"""Visual understanding MCP tools for ClipCannon.
+"""Visual understanding MCP tools for Kannaka Cannon.
 
 Provides get_frame tool for retrieving visual and temporal data.
 """

@@ -1,4 +1,4 @@
-"""Provenance hash chain tracking for ClipCannon.
+"""Provenance hash chain tracking for Kannaka Cannon.
 
 Provides SHA-256 hashing, tamper-evident chain computation and
 verification, and structured provenance record management.

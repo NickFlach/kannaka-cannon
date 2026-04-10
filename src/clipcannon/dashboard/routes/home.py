@@ -1,4 +1,4 @@
-"""Home page routes for the ClipCannon dashboard.
+"""Home page routes for the Kannaka Cannon dashboard.
 
 Provides the root endpoint with system overview including credit balance,
 GPU status, recent projects, and system health.

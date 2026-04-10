@@ -1,4 +1,4 @@
-"""Billing and credit management for ClipCannon.
+"""Billing and credit management for Kannaka Cannon.
 
 Provides HMAC-SHA256 balance integrity, credit rate definitions,
 and an async client for the license server HTTP API.

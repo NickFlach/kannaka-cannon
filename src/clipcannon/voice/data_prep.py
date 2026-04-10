@@ -1,4 +1,4 @@
-"""Voice training data preparation for ClipCannon.
+"""Voice training data preparation for Kannaka Cannon.
 
 Splits vocal stems at silence boundaries, matches transcript text,
 normalizes audio, phonemizes, and writes train/val splits.

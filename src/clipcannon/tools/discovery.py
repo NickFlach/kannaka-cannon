@@ -1,4 +1,4 @@
-"""Discovery MCP tools for ClipCannon.
+"""Discovery MCP tools for Kannaka Cannon.
 
 Provides tools for finding the best moments, querying scenes at
 specific timestamps, and locating natural cut points in long-form

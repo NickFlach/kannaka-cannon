@@ -1,4 +1,4 @@
-"""Disk management MCP tools for ClipCannon.
+"""Disk management MCP tools for Kannaka Cannon.
 
 Provides tools for inspecting disk usage by storage tier (sacred,
 regenerable, ephemeral) and cleaning up files to free space.

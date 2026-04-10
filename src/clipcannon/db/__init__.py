@@ -1,4 +1,4 @@
-"""Database management for ClipCannon.
+"""Database management for Kannaka Cannon.
 
 Provides SQLite connection management with WAL mode, sqlite-vec
 extension loading, schema creation, and query helpers.

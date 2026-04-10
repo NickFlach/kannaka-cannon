@@ -1,4 +1,4 @@
-"""Tool definitions for ClipCannon editing MCP tools.
+"""Tool definitions for Kannaka Cannon editing MCP tools.
 
 Separates the JSON schema tool definitions from the implementation
 to keep both files under the 500-line limit.

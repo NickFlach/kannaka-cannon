@@ -1,4 +1,4 @@
-"""SenseVoice reaction detection pipeline stage for ClipCannon.
+"""SenseVoice reaction detection pipeline stage for Kannaka Cannon.
 
 Detects audience reactions (laughter, applause) in audio using the
 SenseVoice model. Falls back to energy-based detection if unavailable.
@@ -406,7 +406,7 @@ async def run_reactions(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.

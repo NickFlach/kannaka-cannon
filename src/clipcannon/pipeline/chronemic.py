@@ -1,4 +1,4 @@
-"""Chronemic/pacing computation pipeline stage for ClipCannon.
+"""Chronemic/pacing computation pipeline stage for Kannaka Cannon.
 
 Computes words-per-minute, pause ratios, speaker change density,
 and pacing labels in 60-second sliding windows across the video.
@@ -403,7 +403,7 @@ async def run_chronemic(
         project_id: Project identifier.
         db_path: Path to the project database.
         project_dir: Path to the project directory.
-        config: ClipCannon configuration.
+        config: Kannaka Cannon configuration.
 
     Returns:
         StageResult indicating success or failure.
