@@ -93,28 +93,47 @@ def generate_lyrics(
         "--recall-query", query,
         prompt,
     ]
+    cleaned = ""
+    ask_failed = False
     try:
+        # Cap kannaka ask at 90s — it's the slow path; direct fallback is
+        # 30s. If kannaka ask doesn't return in 90s, the bloated HRM is
+        # almost certainly the cause.
+        ask_timeout = min(timeout_sec, 90)
         out = subprocess.run(
             args, capture_output=True, text=True,
-            timeout=timeout_sec,
+            timeout=ask_timeout,
             env={**os.environ, "KANNAKA_QUIET": "1"},
         )
+        if out.returncode != 0:
+            logger.warning(
+                "hrm_lyrics: ask exit %d for %r: %s",
+                out.returncode, title, out.stderr.strip()[:300],
+            )
+            ask_failed = True
+        else:
+            text = (out.stdout or "").strip()
+            cleaned = _clean(text)
+            if not cleaned:
+                logger.info("hrm_lyrics: kannaka ask returned empty stdout for %r", title)
+                ask_failed = True
     except subprocess.TimeoutExpired:
-        logger.warning("hrm_lyrics: ask timed out after %d s for %r", timeout_sec, title)
-        return ""
+        logger.warning("hrm_lyrics: ask timed out after %d s for %r — falling back to direct Anthropic", ask_timeout, title)
+        ask_failed = True
     except (FileNotFoundError, OSError) as exc:
-        logger.warning("hrm_lyrics: ask spawn failed: %s", exc)
-        return ""
+        logger.warning("hrm_lyrics: ask spawn failed: %s — falling back to direct Anthropic", exc)
+        ask_failed = True
 
-    if out.returncode != 0:
-        logger.warning(
-            "hrm_lyrics: ask exit %d for %r: %s",
-            out.returncode, title, out.stderr.strip()[:300],
-        )
-        return ""
+    if cleaned:
+        return cleaned
 
-    text = (out.stdout or "").strip()
-    return _clean(text)
+    # Fallback: direct Anthropic call. The lyric prompt is self-contained
+    # — it doesn't NEED HRM context — so this fallback is safe and
+    # produces equivalent quality output. Triggers when kannaka ask
+    # times out, fails, or returns empty stdout.
+    if ask_failed:
+        return _ask_anthropic_direct(prompt, timeout_sec=min(timeout_sec, 180))
+    return ""
 
 
 # ── Internals ───────────────────────────────────────────────────────
@@ -188,3 +207,71 @@ def _find_kannaka() -> Optional[str]:
     if explicit and os.path.isfile(explicit):
         return explicit
     return shutil.which("kannaka")
+
+
+def _ask_anthropic_direct(prompt: str, *, timeout_sec: int = 180) -> str:
+    """Call Anthropic /v1/messages directly. Used as a fallback when
+    `kannaka ask` silent-fails on a bloated HRM. Reads api_key + model
+    from ~/.kannaka/config.toml so it honors the same config as the
+    rest of the constellation, falling back to env vars otherwise.
+    Returns the assistant's text or "" on any failure.
+    """
+    import json as _json
+    import urllib.request
+    import urllib.error
+    from pathlib import Path
+    import re
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("KANNAKA_LLM_API_KEY") or ""
+    model = "claude-sonnet-4-5"
+    cfg_path = Path.home() / ".kannaka" / "config.toml"
+    try:
+        if cfg_path.exists():
+            text = cfg_path.read_text(encoding="utf-8")
+            if not api_key:
+                m = re.search(r'api_key\s*=\s*"([^"]+)"', text)
+                if m:
+                    api_key = m.group(1)
+            mm = re.search(r'model\s*=\s*"([^"]+)"', text)
+            if mm:
+                model = mm.group(1)
+    except Exception as e:
+        logger.debug("hrm_lyrics: config read failed: %s", e)
+
+    if not api_key:
+        logger.warning("hrm_lyrics: no ANTHROPIC_API_KEY available for direct fallback")
+        return ""
+
+    body = _json.dumps({
+        "model": model,
+        "max_tokens": 4096,
+        "messages": [{"role": "user", "content": prompt}],
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages",
+        data=body,
+        headers={
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout_sec) as resp:
+            data = _json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        body_snippet = ""
+        try:
+            body_snippet = e.read().decode("utf-8", errors="ignore")[:300]
+        except Exception:
+            pass
+        logger.warning("hrm_lyrics: anthropic %d: %s", e.code, body_snippet)
+        return ""
+    except Exception as e:
+        logger.warning("hrm_lyrics: direct anthropic call failed: %s", e)
+        return ""
+
+    blocks = data.get("content") or []
+    text = "\n".join(b.get("text", "") for b in blocks).strip()
+    return _clean(text)
