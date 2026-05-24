@@ -18,8 +18,12 @@ jobs:
       - name: Set up Python 3.12
         run: uv python install 3.12
 
-      - name: Sync dependencies
-        run: uv sync --frozen
+      - name: Sync dependencies (with dev extras for pytest)
+        # pytest + pytest-asyncio + ruff are in [project.optional-dependencies] dev
+        # — uv sync needs --extra dev to install them. Without this the CI
+        # step fails with "Failed to spawn: pytest" because the binary isn't
+        # in the resolved environment.
+        run: uv sync --frozen --extra dev
 
       - name: Pytest
         # tests/ has unit tests + integration/ subdir. The integration
