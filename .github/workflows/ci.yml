@@ -26,7 +26,17 @@ jobs:
         run: uv sync --frozen --extra dev
 
       - name: Pytest
-        # tests/ has unit tests + integration/ subdir. The integration
-        # tests touch external services (Anthropic, OpenAI); gate them
-        # behind a marker so CI runs unit tests only by default.
-        run: uv run pytest -q -m "not integration" tests/
+        # tests/ has unit tests + integration/ + ML-heavy paths
+        # (voiceagent/, test_voice_inference.py) that need torch +
+        # soundfile from the optional `ml`/`phase3` dependency groups.
+        # Those would push CI install size past 2 GB just for torch
+        # alone, so we skip them at collection time. Re-add when the
+        # tests are split into a separate workflow or when uv adds
+        # cheap CPU-only torch installs.
+        run: |
+          uv run pytest -q \
+            --ignore=tests/voiceagent \
+            --ignore=tests/test_voice_inference.py \
+            --ignore=tests/integration \
+            -m "not integration" \
+            tests/
