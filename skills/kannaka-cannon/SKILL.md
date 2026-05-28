@@ -1,7 +1,7 @@
 ---
 name: skill-kannaka-cannon
 version: 0.1.0
-description: "Kannaka Cannon — AI video intelligence via the `clipcannon` MCP server (51 tools). Use when: user wants to analyze/understand a video, transcribe or caption it, find the best moments / cut points, build and render an edit, generate music/SFX, clone a voice / speak, or drive a lip-sync avatar. Covers installing + registering the MCP server and the ingest → understand → edit → render → voice workflow. The stems it extracts become HRM memories (see skill-kannaka-memory)."
+description: "Kannaka Cannon — AI video intelligence via the `clipcannon` MCP server (54 tools). Use when: user wants to analyze/understand a video, transcribe or caption it, find the best moments / cut points, build and render an edit, generate music/SFX, clone a voice / speak, or drive a lip-sync avatar. Covers installing + registering the MCP server and the ingest → understand → edit → render → voice workflow. The stems it extracts become HRM memories (see skill-kannaka-memory)."
 ---
 
 # Kannaka Cannon — AI video intelligence (MCP)
@@ -9,7 +9,7 @@ description: "Kannaka Cannon — AI video intelligence via the `clipcannon` MCP 
 ## What this is
 
 `kannaka-cannon` is the constellation's eyes-on-pixels. It is an **MCP server** (not a CLI)
-exposing **51 `clipcannon_*` tools** backed by a 22-stage pipeline that ingests a clip,
+exposing **54 `clipcannon_*` tools** backed by a 22-stage pipeline that ingests a clip,
 decomposes it into stems (scene, motion, speech/ASR, music separation, faces/emotion, OCR
 text), and folds those stems into the same HRM every kannaka node uses. A 5-minute clip
 becomes one HRM cluster with member memories per scene / speaker turn / face — later
@@ -70,8 +70,7 @@ shell out to — drive everything through the MCP tools.
 |-----|-----|
 | `ANTHROPIC_API_KEY` / `KANNAKA_LLM_API_KEY` | LLM-backed understanding / narrative |
 | `HUGGING_FACE_HUB_TOKEN` | pulling ML model weights |
-| `CLIPCANNON_LICENSE_URL` | license check (billing/credits tools) |
-| `STRIPE_PUBLISHABLE_KEY` | paid credit purchases (billing) |
+| `CLIPCANNON_LICENSE_URL` | license check + the `credits_*` billing tools |
 
 ---
 
@@ -92,7 +91,7 @@ project_create  →  ingest  →  (understand / search)  →  create_edit / modi
    `clipcannon_add_motion` / `add_overlay` / `color_adjust` / `auto_trim` / `auto_music`,
    with `branch_edit` / `list_branches` / `revert_edit` / `edit_history` for versioning.
 5. **Preview** cheaply before paying for a full render: `clipcannon_preview_clip` /
-   `preview_segment` / `preview_layout` (and the `preview_540p` fast path).
+   `preview_segment` / `preview_layout`.
 6. **Render**: `clipcannon_render`, then `clipcannon_inspect_render`.
 7. **Voice + avatar**: `clipcannon_prepare_voice_data` → `voice_profiles` → `speak` /
    `speak_optimized`; `clipcannon_lip_sync` for the avatar.
@@ -102,7 +101,10 @@ generate/voice tools consume credits.
 
 ---
 
-## Tool catalog (51 `clipcannon_*` tools, by group)
+## Tool catalog (54 `clipcannon_*` tools, by group)
+
+> The repo's README badge still reads "51 tools"; the live registry (`ALL_TOOL_DEFINITIONS`
+> in `src/clipcannon/tools/__init__.py`) currently defines **54**.
 
 - **project**: `project_create`, `project_open`, `project_list`, `project_status`, `project_delete`
 - **ingest / understanding**: `ingest`, `get_transcript`, `get_scene_map`, `get_narrative_flow`,
@@ -113,7 +115,7 @@ generate/voice tools consume credits.
   `auto_trim`, `auto_music`, `apply_feedback`, `branch_edit`, `list_branches`, `revert_edit`,
   `edit_history`
 - **rendering / preview**: `render`, `inspect_render`, `preview_clip`, `preview_segment`,
-  `preview_layout`, `preview_540p`
+  `preview_layout`
 - **audio**: `audio_cleanup`, `compose_music`, `compose_midi`, `generate_music`, `generate_sfx`
 - **generate**: `generate_video`
 - **voice**: `prepare_voice_data`, `voice_profiles`, `speak`, `speak_optimized`
@@ -129,5 +131,5 @@ generate/voice tools consume credits.
 
 ## Version
 
-Skill 0.1.0 covers kannaka-cannon 0.1.0 (51 MCP tools, stdio transport, `~/.clipcannon`
+Skill 0.1.0 covers kannaka-cannon 0.1.0 (54 MCP tools, stdio transport, `~/.clipcannon`
 config + per-project sqlite-vec).
