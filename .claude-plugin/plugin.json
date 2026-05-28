@@ -1,0 +1,27 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "kannaka-cannon",
+  "version": "0.1.0",
+  "description": "Kannaka Cannon — AI video intelligence for the constellation. A 22-stage analysis pipeline + MCP server (51 `clipcannon_*` tools) that ingests any clip, decomposes it into stems (scene/motion/speech/music/faces/OCR), folds them into the HRM, and exposes editing, rendering, voice-cloning, and lip-sync avatar tools. Skill teaches Claude how to register the clipcannon MCP server and run the ingest → understand → edit → render → voice/avatar workflow.",
+  "author": {
+    "name": "flaukowski",
+    "email": "nflach78@gmail.com"
+  },
+  "homepage": "https://github.com/NickFlach/kannaka-cannon",
+  "repository": "https://github.com/NickFlach/kannaka-cannon",
+  "license": "BUSL-1.1",
+  "keywords": [
+    "kannaka",
+    "cannon",
+    "clipcannon",
+    "video",
+    "mcp",
+    "voice-cloning",
+    "lip-sync",
+    "avatar",
+    "transcription",
+    "scene-detection",
+    "hrm",
+    "holographic-resonance-medium"
+  ]
+}
