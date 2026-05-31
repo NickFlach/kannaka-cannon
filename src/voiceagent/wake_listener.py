@@ -328,7 +328,7 @@ class WakeWordListener:
         self._running = True
 
         print("\n=== Voice Agent Wake Listener ===")
-        print(f"Wake phrase: 'Hey Jarvis' (or 'Hey Boris')")
+        print("Wake phrase: 'Hey Jarvis' (or 'Hey Boris')")
         print(f"Voice: {self._voice_name}")
         print("Listening... Say 'Hey Jarvis' to activate.")
         print("Press Ctrl+C to quit.")
@@ -357,7 +357,7 @@ class WakeWordListener:
 
                     # Check for wake phrase
                     if self._is_wake_phrase(text):
-                        print(f"\n>>> Wake word detected! Activating...\n")
+                        print("\n>>> Wake word detected! Activating...\n")
                         self._stop_mic()
 
                         # Launch full agent
