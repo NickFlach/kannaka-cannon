@@ -19,6 +19,10 @@ import logging
 import random
 import wave
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from clipcannon.audio.music_gen import MusicResult
 
 logger = logging.getLogger(__name__)
 
@@ -150,7 +154,7 @@ async def generate_music_musicgen(
     model_size: str = "medium",
     seed: int | None = None,
     gpu_device: str = "cuda:0",
-) -> "MusicResult":
+) -> MusicResult:
     """Generate music using Meta's MusicGen model.
 
     Loads MusicGen (auto-downloads weights on first use via HuggingFace),

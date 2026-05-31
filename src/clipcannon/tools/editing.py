@@ -374,7 +374,7 @@ async def clipcannon_modify_edit(
     if current_status == "rendering":
         return error_response(
             "INVALID_STATE",
-            f"Cannot modify edit while rendering is in progress.",
+            "Cannot modify edit while rendering is in progress.",
             {"edit_id": edit_id, "status": current_status},
         )
 
