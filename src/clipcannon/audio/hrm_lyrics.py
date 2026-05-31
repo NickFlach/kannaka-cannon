@@ -30,11 +30,11 @@ generation can still proceed (ACE-Step will improvise its own words).
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import shutil
 import subprocess
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -47,11 +47,11 @@ def generate_lyrics(
     *,
     title: str,
     theme: str,
-    recall_query: Optional[str] = None,
+    recall_query: str | None = None,
     bars: int = 24,
     structure: str = "verse-chorus-verse-chorus-bridge-chorus",
-    voice_note: Optional[str] = None,
-    kannaka_bin: Optional[str] = None,
+    voice_note: str | None = None,
+    kannaka_bin: str | None = None,
     timeout_sec: int = DEFAULT_TIMEOUT_SEC,
 ) -> str:
     """Ask Kannaka to write lyrics for a track.
@@ -118,7 +118,11 @@ def generate_lyrics(
                 logger.info("hrm_lyrics: kannaka ask returned empty stdout for %r", title)
                 ask_failed = True
     except subprocess.TimeoutExpired:
-        logger.warning("hrm_lyrics: ask timed out after %d s for %r — falling back to direct Anthropic", ask_timeout, title)
+        logger.warning(
+            "hrm_lyrics: ask timed out after %d s for %r — falling back to direct Anthropic",
+            ask_timeout,
+            title,
+        )
         ask_failed = True
     except (FileNotFoundError, OSError) as exc:
         logger.warning("hrm_lyrics: ask spawn failed: %s — falling back to direct Anthropic", exc)
@@ -141,7 +145,7 @@ def generate_lyrics(
 
 def _build_prompt(
     *, title: str, theme: str, bars: int,
-    structure: str, voice_note: Optional[str],
+    structure: str, voice_note: str | None,
 ) -> str:
     """Compose the system-style prompt for kannaka ask."""
     voice_line = (
@@ -202,7 +206,7 @@ def _clean(text: str) -> str:
     return cleaned
 
 
-def _find_kannaka() -> Optional[str]:
+def _find_kannaka() -> str | None:
     explicit = os.environ.get("KANNAKA_BIN")
     if explicit and os.path.isfile(explicit):
         return explicit
@@ -217,10 +221,10 @@ def _ask_anthropic_direct(prompt: str, *, timeout_sec: int = 180) -> str:
     Returns the assistant's text or "" on any failure.
     """
     import json as _json
-    import urllib.request
-    import urllib.error
-    from pathlib import Path
     import re
+    import urllib.error
+    import urllib.request
+    from pathlib import Path
 
     api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("KANNAKA_LLM_API_KEY") or ""
     model = "claude-sonnet-4-5"
@@ -262,10 +266,8 @@ def _ask_anthropic_direct(prompt: str, *, timeout_sec: int = 180) -> str:
             data = _json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         body_snippet = ""
-        try:
+        with contextlib.suppress(Exception):
             body_snippet = e.read().decode("utf-8", errors="ignore")[:300]
-        except Exception:
-            pass
         logger.warning("hrm_lyrics: anthropic %d: %s", e.code, body_snippet)
         return ""
     except Exception as e:
