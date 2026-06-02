@@ -102,8 +102,8 @@ def verify_balance_or_raise(
     Raises:
         BillingError: If the HMAC does not match (code=BALANCE_TAMPERED).
     """
-    if not verify_balance(balance, expected_hmac, machine_id):
-        actual_hmac = sign_balance(balance, machine_id)
+    actual_hmac = sign_balance(balance, machine_id)
+    if not hmac_mod.compare_digest(actual_hmac, expected_hmac):
         logger.critical(
             "BALANCE TAMPERED: balance=%d, stored_hmac=%s, expected_hmac=%s, machine_id=%s",
             balance,
