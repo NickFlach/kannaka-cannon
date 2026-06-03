@@ -11,7 +11,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import struct
 import time
 from collections import Counter
 from typing import TYPE_CHECKING
@@ -430,7 +429,7 @@ def _pack_embedding(embedding: np.ndarray) -> bytes:
     Returns:
         Packed bytes.
     """
-    return struct.pack(f"{len(embedding)}f", *embedding.tolist())
+    return embedding.tobytes()
 
 
 def _insert_results(
