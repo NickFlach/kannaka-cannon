@@ -10,7 +10,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import struct
 import time
 from typing import TYPE_CHECKING
 
@@ -249,7 +248,7 @@ def _insert_results(
         vec_inserted = 0
         for idx, (start_ms, _end_ms, emb) in enumerate(embeddings):
             sc = next((c for c, ii in cluster_map.items() if idx in ii), 0)
-            emb_bytes = struct.pack(f"{len(emb)}f", *emb.tolist())
+            emb_bytes = emb.tobytes()
             try:
                 vec_conn.execute(
                     "INSERT INTO vec_speakers"
