@@ -78,8 +78,6 @@ async def _semantic_search(
     limit: int,
 ) -> list[dict[str, object]]:
     """KNN semantic search via sqlite-vec and Nomic embeddings."""
-    import struct
-
     import numpy as np
     from sentence_transformers import SentenceTransformer
 
@@ -95,7 +93,7 @@ async def _semantic_search(
     norm = np.linalg.norm(emb)
     if norm > 1e-10:
         emb = emb / norm
-    query_bytes = struct.pack(f"{len(emb)}f", *emb.tolist())
+    query_bytes = emb.tobytes()
 
     conn = get_connection(db_path, enable_vec=True, dict_rows=True)
     try:
