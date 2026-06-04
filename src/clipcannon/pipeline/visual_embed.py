@@ -13,11 +13,11 @@ monotonic stretches in screen recordings.
 
 from __future__ import annotations
 
+import array
 import asyncio
 import json
 import logging
 import os
-import struct
 import time
 from collections import Counter
 from typing import TYPE_CHECKING
@@ -140,7 +140,7 @@ def _serialize_embedding(embedding: list[float]) -> bytes:
     Returns:
         Packed binary representation.
     """
-    return struct.pack(f"{len(embedding)}f", *embedding)
+    return array.array("f", embedding).tobytes()
 
 
 def _run_embedding_pipeline(
