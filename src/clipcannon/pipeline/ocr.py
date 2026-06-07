@@ -167,10 +167,8 @@ def _run_paddleocr_on_frames(
         RuntimeError: If the OCR subprocess fails.
     """
     import os
-    import subprocess
     import site
-
-    from PIL import Image
+    import subprocess
 
     # Build the LD_LIBRARY_PATH for PaddlePaddle-GPU
     cu13_lib = os.path.join(site.getsitepackages()[0], "nvidia", "cu13", "lib")
