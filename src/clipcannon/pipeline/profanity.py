@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from clipcannon.db.connection import get_connection
-from clipcannon.db.queries import batch_insert, execute, fetch_all
+from clipcannon.db.queries import batch_insert, execute, fetch_all, fetch_one
 from clipcannon.pipeline.orchestrator import StageResult
 from clipcannon.provenance import (
     ExecutionInfo,
@@ -234,13 +234,13 @@ def _get_duration_ms(db_path: Path, project_id: str) -> int:
     """
     conn = get_connection(db_path, enable_vec=False, dict_rows=True)
     try:
-        row = fetch_all(
+        row = fetch_one(
             conn,
             "SELECT duration_ms FROM project WHERE project_id = ?",
             (project_id,),
         )
-        if row and int(row[0].get("duration_ms", 0)) > 0:
-            return int(row[0]["duration_ms"])
+        if row and int(row.get("duration_ms", 0)) > 0:
+            return int(row["duration_ms"])
         return 1
     finally:
         conn.close()
