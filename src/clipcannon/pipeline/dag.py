@@ -109,7 +109,7 @@ def update_stream_status(
                 execute(
                     conn,
                     "UPDATE stream_status SET status = ?, started_at = datetime('now'), "
-                    "error_message = NULL WHERE project_id = ? AND stream_name = ?",
+                    "completed_at = NULL, error_message = NULL WHERE project_id = ? AND stream_name = ?",
                     (status, project_id, stream_name),
                 )
             elif status in ("completed", "failed", "skipped"):
