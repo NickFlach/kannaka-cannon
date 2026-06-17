@@ -186,19 +186,19 @@ async def generate_music_musicgen(
 
     try:
         from audiocraft.models import MusicGen  # type: ignore[import-untyped]
-    except ImportError:
+    except ImportError as e:
         logger.error(
             "audiocraft not installed. Install with: pip install audiocraft"
         )
         raise ImportError(
             "audiocraft not installed. Install with: pip install audiocraft"
-        )
+        ) from e
 
     try:
         import torch  # type: ignore[import-untyped]
-    except ImportError:
+    except ImportError as e:
         logger.error("PyTorch not installed. Required for MusicGen.")
-        raise ImportError("PyTorch not installed. Install with: pip install torch")
+        raise ImportError("PyTorch not installed. Install with: pip install torch") from e
 
     import numpy as np
 

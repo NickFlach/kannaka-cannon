@@ -150,7 +150,7 @@ async def generate_music(
     """
     try:
         from acestep.pipeline_ace_step import ACEStepPipeline  # type: ignore[import-untyped]
-    except ImportError:
+    except ImportError as e:
         logger.error(
             "ACE-Step not installed. Cannot generate AI music. "
             "Install with: pip install git+https://github.com/ace-step/ACE-Step.git"
@@ -158,15 +158,15 @@ async def generate_music(
         raise ImportError(
             "ACE-Step not installed. "
             "Install with: pip install git+https://github.com/ace-step/ACE-Step.git"
-        )
+        ) from e
 
     try:
         import torch  # type: ignore[import-untyped]
-    except ImportError:
+    except ImportError as e:
         logger.error("PyTorch not installed. Required for ACE-Step music generation.")
         raise ImportError(
             "PyTorch not installed. Install with: pip install torch"
-        )
+        ) from e
 
     if seed is None:
         seed = random.randint(0, 2**31 - 1)
@@ -215,7 +215,7 @@ async def generate_music(
             cpu_offload=cpu_offload,
         )
 
-        result = pipeline(
+        pipeline(
             prompt=prompt,
             lyrics=lyrics,
             audio_duration=duration_s,
