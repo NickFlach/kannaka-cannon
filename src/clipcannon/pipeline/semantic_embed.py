@@ -598,7 +598,7 @@ async def run_semantic_embed(
             except Exception:
                 pass  # Column already exists
 
-            for seg, sent in zip(segments, sentiments):
+            for seg, sent in zip(segments, sentiments, strict=True):
                 execute(
                     conn2,
                     "UPDATE transcript_segments SET sentiment = ?, sentiment_score = ? "
