@@ -291,7 +291,7 @@ class TestASSGeneration:
         ]
         ass = generate_ass_file(chunks, "bold_centered")
         assert "[Script Info]" in ass
-        assert "Title: ClipCannon Captions" in ass
+        assert "Title: Kannaka Cannon Captions" in ass
         assert "[V4+ Styles]" in ass
         assert "BoldCentered" in ass
         assert "[Events]" in ass
