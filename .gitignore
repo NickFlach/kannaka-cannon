@@ -70,3 +70,6 @@ docs2/*.jpg
 
 # Sensitive documents - NDAs, legal
 docs2/NDA_*.md
+
+# Local scratch workspace
+workspace/
