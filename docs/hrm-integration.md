@@ -8,47 +8,49 @@ Kannaka Cannon's 22-stage analysis pipeline produces structured intelligence fro
 
 ## Video Analysis Memories
 
+> The concrete, shipped behavior is in **[What's wired today](#whats-wired-today)**
+> below. This section describes the fuller design; only transcript, scene, and
+> music stems are wired so far — highlights, speakers, narrative, emotion, and
+> OCR are candidates for later.
+
 ### What Gets Stored
 
-After each successful `clipcannon_ingest` pipeline run, the following are candidates for HRM storage:
+After a `clipcannon_ingest` pipeline run finalizes, the following are candidates
+for HRM storage (✅ = wired today):
 
-| Analysis Output | Memory Type | Importance | Example Query |
-|-----------------|-------------|------------|---------------|
-| Transcript segments | Semantic | 0.6 | "find where they discuss pricing" |
-| Highlight moments | Emotional | 0.8 | "most exciting moment in any video" |
-| Speaker profiles | Identity | 0.7 | "everything Sarah said across all projects" |
-| Narrative summaries | Structural | 0.7 | "videos with a strong call-to-action ending" |
-| Emotion contours | Affective | 0.5 | "moments where the audience laughed" |
-| OCR text | Factual | 0.4 | "slides mentioning quarterly revenue" |
-| Scene descriptions | Visual | 0.5 | "outdoor scenes with mountains" |
+| Analysis Output | Memory Type | Wired | Example Query |
+|-----------------|-------------|-------|---------------|
+| Transcript (summary) | Semantic | ✅ | "find where they discuss pricing" |
+| Scene descriptions | Visual | ✅ | "outdoor scenes with mountains" |
+| Music / beat features | Audio | ✅ | "upbeat tracks around 120 BPM" |
+| Highlight moments | Emotional | planned | "most exciting moment in any video" |
+| Speaker profiles | Identity | planned | "everything Sarah said across all projects" |
+| Narrative summaries | Structural | planned | "videos with a strong call-to-action ending" |
+| Emotion contours | Affective | planned | "moments where the audience laughed" |
+| OCR text | Factual | planned | "slides mentioning quarterly revenue" |
 
 ### Storage Format
 
-Each memory entry includes:
-
-```json
-{
-  "source": "cannon",
-  "project_id": "proj_abc123",
-  "video_path": "/path/to/video.mp4",
-  "timestamp_range": [12.5, 18.3],
-  "content": "Speaker discusses the impact of AI on healthcare outcomes",
-  "embedding": [0.12, -0.34, ...],
-  "importance": 0.75,
-  "tags": ["transcript", "ai", "healthcare"],
-  "provenance_hash": "sha256:abc123..."
-}
-```
-
-### How It Would Work
+A memory is a single `kannaka remember` call: a plain-text body plus flags. The
+HRM derives phase/amplitude/frequency from the text; Cannon does not send raw
+embeddings or paths. For example:
 
 ```bash
-# After Cannon completes an ingest, store key memories
-kannaka remember "Conference keynote: speaker passionate about AI healthcare, highlight at 2:15-2:45" --importance 0.8
+kannaka remember \
+  "[cannon:proj_abc123] Q4 All-Hands transcript summary (14:32, 2140 words): \
+   And that brings us to the announcement we've all been waiting for…" \
+  --importance 0.68 --category cannon --modality semantic \
+  --tags cannon,transcript,proj_abc123
+```
 
-# Later, from any constellation member
+### How it works
+
+```bash
+# On finalize, Cannon composes one concise summary per stem type and stores
+# each via a short-lived `kannaka remember` (see the table below for importance).
+
+# Later, from any constellation member — or the clipcannon_hrm_recall MCP tool:
 kannaka recall "AI healthcare discussion" --top-k 5
-# Returns: project ID, timestamp range, transcript snippet, highlight score
 ```
 
 ## Observatory Integration
@@ -161,20 +163,41 @@ Current status:
 ### What's wired today
 
 `clipcannon/hrm_bridge.py` shells out to the `kannaka` binary (located via
-`KANNAKA_BIN`, else PATH). On `finalize`, every analyzed project's stem
-outputs are stored as HRM memories, best-effort and non-blocking:
+`KANNAKA_BIN`, else PATH, with `KANNAKA_QUIET=1`). Each `kannaka remember` /
+`kannaka recall` is a short-lived CLI invocation — no long-lived process is
+spawned.
 
-| Stem output | `--modality` | Importance | Tags |
-|-------------|--------------|------------|------|
-| Transcript segments | `semantic` | 0.6 | `cannon,transcript,<project_id>` |
-| Scene descriptions | `visual` | 0.5 | `cannon,scene,<project_id>` |
-| Music / beat features | `audio` | 0.5 | `cannon,music,<project_id>` |
+**When:** on the pipeline `finalize` stage, after a project is marked ready.
+The ingest is fire-and-forget — a no-op when the binary is absent, and any
+error is logged and swallowed so it can never fail the (required) finalize
+stage.
 
-Two MCP tools expose the bridge:
+**What flows in:** one concise memory per stem type (a summary, not full
+text), read from the project's `analysis.db`:
 
-- `clipcannon_hrm_recall {query, top_k}` — cross-project recall over the HRM.
+| Stem | Memory | `--modality` | Importance | Tags |
+|------|--------|--------------|------------|------|
+| Transcript | capped summary of segment text (word count in the header) | `semantic` | `0.50 + words/5000`, ≤ 0.85 | `cannon,transcript,<project_id>` |
+| Scenes | shot-type distribution + sample descriptions | `visual` | `0.40 + scenes/100`, ≤ 0.70 | `cannon,scene,<project_id>` |
+| Music / beats | tempo, beat count, section types | `audio` | 0.50 | `cannon,music,<project_id>` |
+
+Each memory text is prefixed `[cannon:<project_id>] <title> <stem> …` and the
+salient content is capped (default 600 chars) so the HRM isn't flooded.
+
+**Envs:**
+
+- `KANNAKA_BIN` — path to the kannaka binary (else looked up on PATH).
+- `CLIPCANNON_HRM_INGEST` — automatic post-finalize ingest toggle. Defaults
+  **on** (runs whenever the binary is present); set to `0`/`false`/`off` to
+  disable. The explicit `clipcannon_hrm_ingest` tool ignores this gate.
+
+**MCP tools:**
+
+- `clipcannon_hrm_recall {query, top_k}` — cross-project recall over the HRM
+  via `kannaka recall`. (Distinct from `clipcannon_search_content`, which does
+  per-project sqlite-vec / text search within one project's DB.)
 - `clipcannon_hrm_ingest {project_id}` — backfill an already-analyzed project.
 
-If the `kannaka` binary is absent, ingest is a no-op and recall returns
-`hrm_available: false` — Cannon works standalone, and the HRM/NATS/Observatory
-integration layers on top without breaking existing functionality.
+Both return `hrm_available: false` instead of erroring when the binary is
+absent — Cannon works standalone, and the HRM/NATS/Observatory integration
+layers on top without breaking existing functionality.

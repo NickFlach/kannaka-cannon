@@ -293,8 +293,11 @@ async def _hrm_ingest_best_effort(project_id: str, db_path: Path) -> None:
         db_path: Path to the project database.
     """
     try:
-        from clipcannon.hrm_bridge import hrm_available, ingest_project
+        from clipcannon.hrm_bridge import hrm_available, ingest_enabled, ingest_project
 
+        if not ingest_enabled():
+            logger.debug("HRM ingest disabled via CLIPCANNON_HRM_INGEST")
+            return
         if not hrm_available():
             return
         summary = await asyncio.to_thread(ingest_project, project_id, db_path)

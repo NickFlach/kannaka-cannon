@@ -25,6 +25,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from clipcannon import hrm_bridge
+from clipcannon.pipeline.finalize import _hrm_ingest_best_effort
 from clipcannon.tools import hrm_tools
 
 if TYPE_CHECKING:
@@ -236,7 +237,7 @@ def _seed_db(db_path: Path, project_id: str = "proj_hrm") -> None:
     conn = sqlite3.connect(str(db_path))
     conn.executescript(
         """
-        CREATE TABLE project (project_id TEXT PRIMARY KEY, name TEXT);
+        CREATE TABLE project (project_id TEXT PRIMARY KEY, name TEXT, duration_ms INTEGER);
         CREATE TABLE transcript_segments (
             segment_id INTEGER PRIMARY KEY AUTOINCREMENT, project_id TEXT,
             start_ms INTEGER, end_ms INTEGER, text TEXT);
@@ -252,7 +253,7 @@ def _seed_db(db_path: Path, project_id: str = "proj_hrm") -> None:
             start_ms INTEGER, end_ms INTEGER, type TEXT);
         """
     )
-    conn.execute("INSERT INTO project VALUES (?, ?)", (project_id, "Demo Video"))
+    conn.execute("INSERT INTO project VALUES (?, ?, ?)", (project_id, "Demo Video", 6000))
     conn.executemany(
         "INSERT INTO transcript_segments (project_id, start_ms, end_ms, text) VALUES (?,?,?,?)",
         [
@@ -291,7 +292,7 @@ class TestIngestProject:
         assert result["available"] is False
         assert result["stored"] == 0
 
-    def test_stores_all_stem_types(
+    def test_stores_summary_per_stem_type(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         db = tmp_path / "analysis.db"
@@ -307,32 +308,60 @@ class TestIngestProject:
 
         result = hrm_bridge.ingest_project("proj_hrm", db)
 
-        # 2 transcript (blank skipped) + 2 scenes + 1 music summary = 5
+        # One concise summary each: transcript + scenes + music = 3.
         assert result["available"] is True
-        assert result["transcripts"] == 2
-        assert result["scenes"] == 2
+        assert result["transcript"] == 1
+        assert result["scenes"] == 1
         assert result["music"] == 1
-        assert result["stored"] == 5
+        assert result["stored"] == 3
         assert result["failed"] == 0
-        assert len(recorded) == 5
+        assert len(recorded) == 3
 
-        # Modality routing: transcripts semantic, scenes visual, music audio.
+        # Modality routing: transcript semantic, scenes visual, music audio.
         modalities = [cmd[cmd.index("--modality") + 1] for cmd in recorded]
-        assert modalities.count("semantic") == 2
-        assert modalities.count("visual") == 2
-        assert modalities.count("audio") == 1
+        assert sorted(modalities) == ["audio", "semantic", "visual"]
 
-        # Every memory is tagged with the project id.
+        # Every memory is tagged with the project id and the cannon namespace.
         for cmd in recorded:
             tags = cmd[cmd.index("--tags") + 1]
             assert "proj_hrm" in tags
             assert "cannon" in tags
 
-        # Content carries the project title and a locator prefix.
+        # Transcript is a single summary that folds in multiple segments.
         contents = [cmd[2] for cmd in recorded]
-        assert any("Demo Video transcript" in c and "hello there" in c for c in contents)
-        assert any("Demo Video scene" in c and "medium shot" in c for c in contents)
-        assert any("Demo Video music" in c and "120 BPM" in c for c in contents)
+        tx = next(c for c in contents if "transcript summary" in c)
+        assert "hello there" in tx and "welcome to the show" in tx
+        assert any("scenes (2 over" in c and "medium" in c for c in contents)
+        assert any("music:" in c and "120 BPM" in c for c in contents)
+
+    def test_transcript_summary_is_capped(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        db = tmp_path / "analysis.db"
+        _seed_db(db)
+        conn = sqlite3.connect(str(db))
+        conn.execute("DELETE FROM transcript_segments")
+        conn.execute(
+            "INSERT INTO transcript_segments (project_id, start_ms, end_ms, text) "
+            "VALUES (?,?,?,?)",
+            ("proj_hrm", 0, 1000, "word " * 800),  # ~4000 chars of transcript
+        )
+        conn.commit()
+        conn.close()
+
+        recorded: list[list[str]] = []
+        monkeypatch.setattr(hrm_bridge, "find_kannaka", lambda *_a, **_k: "/fake/kannaka")
+        monkeypatch.setattr(
+            hrm_bridge.subprocess,
+            "run",
+            lambda cmd, **kw: recorded.append(cmd)  # type: ignore[func-returns-value]
+            or subprocess.CompletedProcess(cmd, 0, "", ""),
+        )
+        hrm_bridge.ingest_project("proj_hrm", db, max_chars=200)
+
+        tx = next(c[2] for c in recorded if "transcript summary" in c[2])
+        assert tx.endswith("…")  # ellipsis -> truncated
+        assert len(tx) < 400  # prefix + ~200-char body, nowhere near 4000
 
     def test_no_music_when_absent(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -353,7 +382,7 @@ class TestIngestProject:
         )
         result = hrm_bridge.ingest_project("proj_hrm", db)
         assert result["music"] == 0
-        assert result["stored"] == 4
+        assert result["stored"] == 2  # transcript + scenes
 
     def test_real_binary_ingest(
         self, tmp_path: Path, fake_kannaka: SimpleNamespace, monkeypatch: pytest.MonkeyPatch
@@ -363,8 +392,58 @@ class TestIngestProject:
         monkeypatch.setenv("KANNAKA_BIN", fake_kannaka.bin)
         monkeypatch.setenv("FAKE_KANNAKA_LOG", str(fake_kannaka.log))
         result = hrm_bridge.ingest_project("proj_hrm", db)
-        assert result["stored"] == 5
-        assert len(_logged_calls(fake_kannaka.log)) == 5
+        assert result["stored"] == 3
+        assert len(_logged_calls(fake_kannaka.log)) == 3
+
+
+class TestIngestEnabled:
+    def test_default_on(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv("CLIPCANNON_HRM_INGEST", raising=False)
+        assert hrm_bridge.ingest_enabled() is True
+
+    @pytest.mark.parametrize("val", ["0", "false", "off", "no"])
+    def test_explicit_off(self, val: str, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("CLIPCANNON_HRM_INGEST", val)
+        assert hrm_bridge.ingest_enabled() is False
+
+    @pytest.mark.parametrize("val", ["1", "true", "on", "yes"])
+    def test_explicit_on(self, val: str, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("CLIPCANNON_HRM_INGEST", val)
+        assert hrm_bridge.ingest_enabled() is True
+
+
+class TestFinalizeHook:
+    """The pipeline hook is fire-and-forget: it must never raise."""
+
+    @pytest.mark.asyncio
+    async def test_never_raises_when_ingest_errors(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("CLIPCANNON_HRM_INGEST", "1")
+        monkeypatch.setattr(hrm_bridge, "hrm_available", lambda *_a, **_k: True)
+
+        def _boom(*_a: object, **_k: object) -> object:
+            raise RuntimeError("kannaka exploded")
+
+        monkeypatch.setattr(hrm_bridge, "ingest_project", _boom)
+        # Must complete without propagating the error.
+        await _hrm_ingest_best_effort("proj", tmp_path / "analysis.db")
+
+    @pytest.mark.asyncio
+    async def test_skips_when_disabled(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("CLIPCANNON_HRM_INGEST", "0")
+        calls = {"n": 0}
+
+        def _count(*_a: object, **_k: object) -> dict[str, object]:
+            calls["n"] += 1
+            return {}
+
+        monkeypatch.setattr(hrm_bridge, "hrm_available", lambda *_a, **_k: True)
+        monkeypatch.setattr(hrm_bridge, "ingest_project", _count)
+        await _hrm_ingest_best_effort("proj", tmp_path / "analysis.db")
+        assert calls["n"] == 0
 
 
 # ── MCP tools ───────────────────────────────────────────────────────
@@ -410,7 +489,7 @@ class TestHrmTools:
         )
         out = await hrm_tools.clipcannon_hrm_ingest("proj_hrm")
         assert out["hrm_available"] is True
-        assert out["stored"] == 5
+        assert out["stored"] == 3
 
     @pytest.mark.asyncio
     async def test_ingest_tool_unavailable(

@@ -19,26 +19,22 @@ import logging
 import os
 import shutil
 import subprocess
+from collections import Counter
 from typing import TYPE_CHECKING
 
 from clipcannon.db.connection import get_connection
 from clipcannon.db.queries import fetch_all, fetch_one
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Sequence
+    from collections.abc import Sequence
     from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 _DEFAULT_TIMEOUT = 30
-_DEFAULT_MAX_PER_TYPE = 500
-
-# Importance seeds per stem type (see docs/hrm-integration.md).
-_IMPORTANCE = {
-    "transcript": 0.6,
-    "scene": 0.5,
-    "music": 0.5,
-}
+_MAX_MEMORY_CHARS = 600  # cap on composed memory text — a summary, not full text
+_MAX_SCENE_SAMPLES = 3  # sample scene descriptions folded into the scene summary
+_MUSIC_IMPORTANCE = 0.5
 
 
 # ── Binary discovery ────────────────────────────────────────────────
@@ -60,6 +56,20 @@ def find_kannaka(kannaka_bin: str | None = None) -> str | None:
 def hrm_available(kannaka_bin: str | None = None) -> bool:
     """Return True if the kannaka binary can be located."""
     return find_kannaka(kannaka_bin) is not None
+
+
+def ingest_enabled() -> bool:
+    """Whether automatic pipeline HRM ingest is enabled.
+
+    Controlled by ``CLIPCANNON_HRM_INGEST``; defaults ON (so ingest runs
+    whenever the kannaka binary is present). Set it to ``0``/``false``/``off``
+    to disable the automatic post-finalize ingest. The explicit
+    ``clipcannon_hrm_ingest`` MCP tool ignores this gate.
+    """
+    val = os.environ.get("CLIPCANNON_HRM_INGEST")
+    if val is None:
+        return True
+    return val.strip().lower() in ("1", "true", "yes", "on")
 
 
 # ── Memory write / read ─────────────────────────────────────────────
@@ -208,45 +218,53 @@ def _scene_description(row: dict[str, object]) -> str:
     return ", ".join(parts)
 
 
-def _project_title(db_path: Path, project_id: str) -> str:
-    """Best-effort project display name."""
-    conn = get_connection(db_path, enable_vec=False, dict_rows=True)
-    try:
-        row = fetch_one(
-            conn, "SELECT name FROM project WHERE project_id = ?", (project_id,)
-        )
-    finally:
-        conn.close()
-    if row and row.get("name"):
-        return str(row["name"])
-    return project_id
+def _cap(text: str, limit: int) -> str:
+    """Collapse whitespace and truncate ``text`` to ``limit`` chars."""
+    collapsed = " ".join(text.split())
+    if len(collapsed) <= limit:
+        return collapsed
+    return collapsed[: limit - 1].rstrip() + "…"
 
 
-def _store_all(
-    memories: Iterable[tuple[str, float, list[str], str]],
-    *,
-    kannaka_bin: str | None,
-) -> tuple[int, int]:
-    """Store a batch of (content, importance, tags, modality) tuples.
+def _transcript_importance(word_count: int) -> float:
+    """More spoken content -> higher salience (capped)."""
+    return round(min(0.85, 0.50 + word_count / 5000.0), 2)
 
-    Returns:
-        (stored, failed) counts.
-    """
-    stored = 0
-    failed = 0
-    for content, importance, tags, modality in memories:
-        ok = remember(
-            content,
-            importance=importance,
-            tags=tags,
-            modality=modality,
-            kannaka_bin=kannaka_bin,
-        )
-        if ok:
-            stored += 1
-        else:
-            failed += 1
-    return stored, failed
+
+def _scene_importance(scene_count: int) -> float:
+    """More distinct scenes -> higher salience (capped)."""
+    return round(min(0.70, 0.40 + scene_count / 100.0), 2)
+
+
+def _summarize_scenes(
+    project_id: str,
+    title: str,
+    duration: str,
+    scenes: list[dict[str, object]],
+) -> str:
+    """Compose one concise memory describing a project's scenes."""
+    shots = Counter(str(s.get("shot_type") or "unknown") for s in scenes)
+    shot_str = ", ".join(f"{name}x{n}" for name, n in shots.most_common())
+    samples = "; ".join(_scene_description(s) for s in scenes[:_MAX_SCENE_SAMPLES])
+    body = _cap(f"shot types {shot_str}. samples: {samples}", _MAX_MEMORY_CHARS)
+    return f"[cannon:{project_id}] {title} scenes ({len(scenes)} over {duration}): {body}"
+
+
+def _summarize_music(
+    project_id: str,
+    title: str,
+    beats: dict[str, object],
+    sections: list[dict[str, object]],
+) -> str:
+    """Compose one concise memory describing a project's music features."""
+    tempo = beats.get("tempo_bpm")
+    tempo_str = f"{float(tempo):.0f} BPM" if tempo is not None else "unknown tempo"
+    section_types = [str(s.get("type")) for s in sections if s.get("type")]
+    section_str = f", sections: {', '.join(section_types)}" if section_types else ""
+    body = _cap(
+        f"{tempo_str}, {beats.get('beat_count') or 0} beats{section_str}", _MAX_MEMORY_CHARS
+    )
+    return f"[cannon:{project_id}] {title} music: {body}"
 
 
 def ingest_project(
@@ -254,126 +272,135 @@ def ingest_project(
     db_path: Path,
     *,
     kannaka_bin: str | None = None,
-    max_per_type: int = _DEFAULT_MAX_PER_TYPE,
+    max_chars: int = _MAX_MEMORY_CHARS,
 ) -> dict[str, object]:
-    """Store a project's stem outputs into the HRM.
+    """Store a project's stem outputs into the HRM as concise summaries.
 
-    Reads transcript segments, scene descriptions, and music/beat features
-    from the project's analysis DB and stores each as an HRM memory tagged
-    with the project id. No-op (``available: False``) if the kannaka binary
-    cannot be located, so callers never need to guard.
+    Composes at most one memory per stem type — a transcript summary
+    (capped, not full text), a scene summary, and a music summary — each
+    tagged ``cannon,<type>,<project_id>`` with an importance heuristic, then
+    stores them via ``kannaka remember``. No-op (``available: False``) if the
+    kannaka binary cannot be located, so callers never need to guard.
 
     Args:
         project_id: Project identifier.
         db_path: Path to the project's ``analysis.db``.
         kannaka_bin: Explicit binary path override.
-        max_per_type: Cap on memories stored per stem type (avoids flooding
-            the HRM on long videos).
+        max_chars: Cap on the salient-content portion of each memory.
 
     Returns:
-        Dict with per-type counts and totals.
+        Dict with per-type flags (0/1) and stored/failed totals.
     """
     binary = find_kannaka(kannaka_bin)
     if not binary:
-        logger.info("HRM ingest skipped: kannaka binary not found")
-        return {"available": False, "stored": 0, "failed": 0}
-
-    title = _project_title(db_path, project_id)
+        logger.debug("HRM ingest skipped for %s: kannaka binary not found", project_id)
+        return {
+            "available": False,
+            "stored": 0,
+            "failed": 0,
+            "transcript": 0,
+            "scenes": 0,
+            "music": 0,
+        }
 
     conn = get_connection(db_path, enable_vec=False, dict_rows=True)
     try:
+        proj = fetch_one(
+            conn,
+            "SELECT name, duration_ms FROM project WHERE project_id = ?",
+            (project_id,),
+        )
         transcripts = fetch_all(
             conn,
-            "SELECT start_ms, end_ms, text FROM transcript_segments "
+            "SELECT text FROM transcript_segments "
             "WHERE project_id = ? AND text IS NOT NULL AND trim(text) != '' "
-            "ORDER BY start_ms LIMIT ?",
-            (project_id, max_per_type),
+            "ORDER BY start_ms",
+            (project_id,),
         )
         scenes = fetch_all(
             conn,
             "SELECT start_ms, end_ms, shot_type, dominant_colors, "
             "face_detected, quality_classification FROM scenes "
-            "WHERE project_id = ? ORDER BY start_ms LIMIT ?",
-            (project_id, max_per_type),
+            "WHERE project_id = ? ORDER BY start_ms",
+            (project_id,),
         )
         beats = fetch_one(
             conn,
-            "SELECT has_music, tempo_bpm, beat_count FROM beats "
-            "WHERE project_id = ? LIMIT 1",
+            "SELECT has_music, tempo_bpm, beat_count FROM beats WHERE project_id = ? LIMIT 1",
             (project_id,),
         )
         sections = fetch_all(
             conn,
             "SELECT type FROM music_sections WHERE project_id = ? "
-            "AND type IS NOT NULL ORDER BY start_ms LIMIT ?",
-            (project_id, max_per_type),
+            "AND type IS NOT NULL ORDER BY start_ms",
+            (project_id,),
         )
     finally:
         conn.close()
 
-    counts = {"transcripts": 0, "scenes": 0, "music": 0}
-    total_stored = 0
-    total_failed = 0
+    title = str(proj["name"]) if proj and proj.get("name") else project_id
+    duration = _fmt_ts(proj.get("duration_ms")) if proj else "?"
 
-    # Transcripts → semantic memories
-    tx_batch: list[tuple[str, float, list[str], str]] = []
-    for seg in transcripts:
-        text = str(seg.get("text") or "").strip()
-        if not text:
-            continue
+    # (content, importance, tags, modality, kind) — at most one per stem type.
+    memories: list[tuple[str, float, list[str], str, str]] = []
+
+    texts = [t for t in (str(s.get("text") or "").strip() for s in transcripts) if t]
+    if texts:
+        word_count = sum(len(t.split()) for t in texts)
+        body = _cap(" ".join(texts), max_chars)
         content = (
-            f"[cannon:{project_id}] {title} transcript "
-            f"({_fmt_ts(seg.get('start_ms'))}-{_fmt_ts(seg.get('end_ms'))}): {text}"
+            f"[cannon:{project_id}] {title} transcript summary "
+            f"({duration}, {word_count} words): {body}"
         )
-        tx_batch.append(
-            (content, _IMPORTANCE["transcript"], ["cannon", "transcript", project_id], "semantic")
+        memories.append(
+            (
+                content,
+                _transcript_importance(word_count),
+                ["cannon", "transcript", project_id],
+                "semantic",
+                "transcript",
+            )
         )
-    stored, failed = _store_all(tx_batch, kannaka_bin=binary)
-    counts["transcripts"] = stored
-    total_stored += stored
-    total_failed += failed
 
-    # Scene descriptions → visual memories
-    sc_batch: list[tuple[str, float, list[str], str]] = []
-    for scene in scenes:
-        content = (
-            f"[cannon:{project_id}] {title} scene "
-            f"({_fmt_ts(scene.get('start_ms'))}-{_fmt_ts(scene.get('end_ms'))}): "
-            f"{_scene_description(scene)}"
+    if scenes:
+        memories.append(
+            (
+                _summarize_scenes(project_id, title, duration, scenes),
+                _scene_importance(len(scenes)),
+                ["cannon", "scene", project_id],
+                "visual",
+                "scenes",
+            )
         )
-        sc_batch.append(
-            (content, _IMPORTANCE["scene"], ["cannon", "scene", project_id], "visual")
-        )
-    stored, failed = _store_all(sc_batch, kannaka_bin=binary)
-    counts["scenes"] = stored
-    total_stored += stored
-    total_failed += failed
 
-    # Music / beat features → one audio summary memory
     if beats and beats.get("has_music"):
-        tempo = beats.get("tempo_bpm")
-        tempo_str = f"{float(tempo):.0f} BPM" if tempo is not None else "unknown tempo"
-        section_types = [str(s.get("type")) for s in sections if s.get("type")]
-        section_str = (
-            f", sections: {', '.join(section_types)}" if section_types else ""
+        memories.append(
+            (
+                _summarize_music(project_id, title, beats, sections),
+                _MUSIC_IMPORTANCE,
+                ["cannon", "music", project_id],
+                "audio",
+                "music",
+            )
         )
-        content = (
-            f"[cannon:{project_id}] {title} music: {tempo_str}, "
-            f"{beats.get('beat_count') or 0} beats{section_str}"
-        )
-        stored, failed = _store_all(
-            [(content, _IMPORTANCE["music"], ["cannon", "music", project_id], "audio")],
-            kannaka_bin=binary,
-        )
-        counts["music"] = stored
-        total_stored += stored
-        total_failed += failed
+
+    counts = {"transcript": 0, "scenes": 0, "music": 0}
+    stored = 0
+    failed = 0
+    for content, importance, tags, modality, kind in memories:
+        if remember(
+            content, importance=importance, tags=tags, modality=modality, kannaka_bin=binary
+        ):
+            stored += 1
+            counts[kind] = 1
+        else:
+            failed += 1
 
     result = {
         "available": True,
         "project_id": project_id,
-        "stored": total_stored,
-        "failed": total_failed,
+        "stored": stored,
+        "failed": failed,
         **counts,
     }
     logger.info("HRM ingest for %s: %s", project_id, result)
