@@ -148,14 +148,33 @@ Cannon publishes events to the Kannaka NATS mesh for real-time constellation coo
 
 ## Implementation Status
 
-This document describes the planned integration architecture. Current status:
+Current status:
 
 - [x] Cannon analysis pipeline (22 stages, production-ready)
-- [x] Cannon MCP tools (51 tools, production-ready)
+- [x] Cannon MCP tools (production-ready)
 - [x] Cannon SQLite + sqlite-vec storage (per-project)
-- [ ] HRM memory bridge (planned)
+- [x] HRM memory bridge (`clipcannon/hrm_bridge.py`)
+- [x] Cross-project recall via HRM (`clipcannon_hrm_recall` MCP tool)
 - [ ] NATS event publisher (planned)
 - [ ] Observatory visualization hooks (planned)
-- [ ] Cross-project recall via HRM (planned)
 
-The integration points are designed to be additive -- Cannon works standalone today, and HRM/NATS/Observatory integration will layer on top without breaking existing functionality.
+### What's wired today
+
+`clipcannon/hrm_bridge.py` shells out to the `kannaka` binary (located via
+`KANNAKA_BIN`, else PATH). On `finalize`, every analyzed project's stem
+outputs are stored as HRM memories, best-effort and non-blocking:
+
+| Stem output | `--modality` | Importance | Tags |
+|-------------|--------------|------------|------|
+| Transcript segments | `semantic` | 0.6 | `cannon,transcript,<project_id>` |
+| Scene descriptions | `visual` | 0.5 | `cannon,scene,<project_id>` |
+| Music / beat features | `audio` | 0.5 | `cannon,music,<project_id>` |
+
+Two MCP tools expose the bridge:
+
+- `clipcannon_hrm_recall {query, top_k}` — cross-project recall over the HRM.
+- `clipcannon_hrm_ingest {project_id}` — backfill an already-analyzed project.
+
+If the `kannaka` binary is absent, ingest is a no-op and recall returns
+`hrm_available: false` — Cannon works standalone, and the HRM/NATS/Observatory
+integration layers on top without breaking existing functionality.
