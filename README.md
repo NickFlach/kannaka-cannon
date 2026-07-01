@@ -56,6 +56,25 @@ Python 3.12+ required. Uses `uv` for fast deterministic installs.
 
 ---
 
+## Run the dashboard
+
+```bash
+# Local development — auto-login, no secret required
+CLIPCANNON_DEV_MODE=1 uv run python -m clipcannon.dashboard.app
+
+# Production — dev mode is OFF by default and a real JWT secret is mandatory
+export CLIPCANNON_JWT_SECRET="<a strong, unique value>"
+uv run python -m clipcannon.dashboard.app
+```
+
+`CLIPCANNON_DEV_MODE` defaults to **off** (production). In dev mode the
+dashboard auto-authenticates and signs sessions with a well-known dev
+secret. In production the server **fails hard at startup** unless
+`CLIPCANNON_JWT_SECRET` is set to a non-default value, so forged session
+cookies are impossible. Set `CLIPCANNON_DEV_MODE=1` for local work.
+
+---
+
 ## Architecture
 
 ```

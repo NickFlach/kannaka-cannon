@@ -8,6 +8,7 @@ All test modules share the same probed/extracted project data.
 from __future__ import annotations
 
 import asyncio
+import os
 from pathlib import Path
 
 import pytest
@@ -18,6 +19,17 @@ from clipcannon.db.queries import execute
 from clipcannon.db.schema import create_project_db
 
 TEST_VIDEO = Path("/home/cabdru/clipcannon/testdata/2026-03-20 14-43-20.mp4")
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    """Enable dev mode for the suite unless the environment overrides it.
+
+    CLIPCANNON_DEV_MODE defaults to OFF (production) in the app. The
+    dashboard and auth tests rely on dev-mode auto-login and the default
+    JWT secret. Tests that exercise production behavior use monkeypatch to
+    override this per-test.
+    """
+    os.environ.setdefault("CLIPCANNON_DEV_MODE", "1")
 
 
 @pytest.fixture(scope="session")

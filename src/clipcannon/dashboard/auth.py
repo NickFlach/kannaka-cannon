@@ -40,10 +40,13 @@ _DEV_USER_EMAIL = "dev@clipcannon.local"
 def is_dev_mode() -> bool:
     """Check whether the dashboard is running in development mode.
 
+    Defaults to OFF (production): set CLIPCANNON_DEV_MODE=1 for local
+    development to enable auto-login and the insecure default JWT secret.
+
     Returns:
         True if CLIPCANNON_DEV_MODE is set to a truthy value.
     """
-    return os.environ.get("CLIPCANNON_DEV_MODE", "1").lower() in ("1", "true", "yes")
+    return os.environ.get("CLIPCANNON_DEV_MODE", "0").lower() in ("1", "true", "yes")
 
 
 def get_jwt_secret() -> str:
