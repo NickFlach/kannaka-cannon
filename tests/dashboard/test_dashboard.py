@@ -11,7 +11,10 @@ from fastapi.testclient import TestClient
 
 from clipcannon.dashboard.app import create_app
 from clipcannon.dashboard.auth import (
+    _DEFAULT_DEV_SECRET,
     create_session_token,
+    get_jwt_secret,
+    is_dev_mode,
     verify_session_token,
 )
 
@@ -79,6 +82,61 @@ class TestAuth:
         """Invalid JWT token returns None."""
         result = verify_session_token("invalid-token-string")
         assert result is None
+
+
+class TestJwtSecretHardening:
+    """Production JWT secret enforcement (fail-hard when misconfigured)."""
+
+    def test_dev_mode_allows_default_secret(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """In dev mode the default secret is allowed."""
+        monkeypatch.setenv("CLIPCANNON_DEV_MODE", "1")
+        monkeypatch.delenv("CLIPCANNON_JWT_SECRET", raising=False)
+        assert is_dev_mode() is True
+        assert get_jwt_secret() == _DEFAULT_DEV_SECRET
+
+    def test_prod_default_secret_fails_hard(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Prod (dev mode off) with the default secret raises."""
+        monkeypatch.setenv("CLIPCANNON_DEV_MODE", "0")
+        monkeypatch.delenv("CLIPCANNON_JWT_SECRET", raising=False)
+        with pytest.raises(RuntimeError, match="CLIPCANNON_JWT_SECRET"):
+            get_jwt_secret()
+
+    def test_prod_explicit_default_secret_fails_hard(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Prod with the secret set to the known default still raises."""
+        monkeypatch.setenv("CLIPCANNON_DEV_MODE", "0")
+        monkeypatch.setenv("CLIPCANNON_JWT_SECRET", _DEFAULT_DEV_SECRET)
+        with pytest.raises(RuntimeError, match="insecure default"):
+            get_jwt_secret()
+
+    def test_prod_real_secret_ok(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Prod with a real secret resolves without raising."""
+        monkeypatch.setenv("CLIPCANNON_DEV_MODE", "0")
+        monkeypatch.setenv("CLIPCANNON_JWT_SECRET", "a-real-strong-secret-123")
+        assert get_jwt_secret() == "a-real-strong-secret-123"
+
+    def test_create_app_fails_hard_without_prod_secret(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The app refuses to start in prod without a real secret."""
+        monkeypatch.setenv("CLIPCANNON_DEV_MODE", "0")
+        monkeypatch.delenv("CLIPCANNON_JWT_SECRET", raising=False)
+        with pytest.raises(RuntimeError, match="CLIPCANNON_JWT_SECRET"):
+            create_app()
+
+    def test_create_app_ok_with_prod_secret(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The app starts in prod when a real secret is set."""
+        monkeypatch.setenv("CLIPCANNON_DEV_MODE", "0")
+        monkeypatch.setenv("CLIPCANNON_JWT_SECRET", "a-real-strong-secret-123")
+        app = create_app()
+        assert app is not None
 
 
 class TestCredits:

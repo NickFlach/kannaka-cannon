@@ -20,7 +20,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from clipcannon import __version__
-from clipcannon.dashboard.auth import is_dev_mode
+from clipcannon.dashboard.auth import get_jwt_secret, is_dev_mode
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -57,7 +57,15 @@ def create_app() -> FastAPI:
 
     Returns:
         Configured FastAPI application with all routes and middleware.
+
+    Raises:
+        RuntimeError: If running in production (dev mode off) without a
+            real CLIPCANNON_JWT_SECRET set.
     """
+    # Fail hard at startup rather than signing tokens with the insecure
+    # default secret in production.
+    get_jwt_secret()
+
     app = FastAPI(
         title="Kannaka Cannon Dashboard",
         version=__version__,

@@ -26,8 +26,10 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-# Secret key for JWT signing (dev-only, not for production)
-_JWT_SECRET = os.environ.get("CLIPCANNON_JWT_SECRET", "clipcannon-dev-secret-not-for-production")
+# Publicly-known dev secret. Signing production tokens with this would let
+# anyone forge session cookies, so get_jwt_secret() refuses to use it when
+# dev mode is off.
+_DEFAULT_DEV_SECRET = "clipcannon-dev-secret-not-for-production"
 _JWT_ALGORITHM = "HS256"
 _SESSION_COOKIE_NAME = "clipcannon_session"
 _SESSION_TTL_SECONDS = 30 * 24 * 60 * 60  # 30 days
@@ -42,6 +44,32 @@ def is_dev_mode() -> bool:
         True if CLIPCANNON_DEV_MODE is set to a truthy value.
     """
     return os.environ.get("CLIPCANNON_DEV_MODE", "1").lower() in ("1", "true", "yes")
+
+
+def get_jwt_secret() -> str:
+    """Resolve the JWT signing secret, enforcing a real secret in production.
+
+    In production (dev mode off) CLIPCANNON_JWT_SECRET must be set to a
+    non-default value; otherwise session tokens could be forged with the
+    publicly-known dev secret. Raises in that case so the server refuses
+    to start or sign/verify tokens.
+
+    Returns:
+        The JWT signing secret to use.
+
+    Raises:
+        RuntimeError: If dev mode is off and the secret is unset or the
+            insecure default.
+    """
+    secret = os.environ.get("CLIPCANNON_JWT_SECRET", _DEFAULT_DEV_SECRET)
+    if not is_dev_mode() and secret == _DEFAULT_DEV_SECRET:
+        raise RuntimeError(
+            "CLIPCANNON_JWT_SECRET is unset or set to the insecure default "
+            "while CLIPCANNON_DEV_MODE is off. Set CLIPCANNON_JWT_SECRET to a "
+            "strong, unique value for production, or set CLIPCANNON_DEV_MODE=1 "
+            "for local development."
+        )
+    return secret
 
 
 def create_session_token(user_id: str, email: str) -> str:
@@ -61,7 +89,7 @@ def create_session_token(user_id: str, email: str) -> str:
         "iat": now,
         "exp": now + _SESSION_TTL_SECONDS,
     }
-    return jwt.encode(payload, _JWT_SECRET, algorithm=_JWT_ALGORITHM)
+    return jwt.encode(payload, get_jwt_secret(), algorithm=_JWT_ALGORITHM)
 
 
 def verify_session_token(token: str) -> dict[str, str | int] | None:
@@ -74,7 +102,7 @@ def verify_session_token(token: str) -> dict[str, str | int] | None:
         Decoded payload dictionary if valid, None if invalid or expired.
     """
     try:
-        payload = jwt.decode(token, _JWT_SECRET, algorithms=[_JWT_ALGORITHM])
+        payload = jwt.decode(token, get_jwt_secret(), algorithms=[_JWT_ALGORITHM])
         return payload  # type: ignore[return-value]
     except JWTError as exc:
         logger.debug("JWT verification failed: %s", exc)
