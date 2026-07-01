@@ -68,6 +68,10 @@ from clipcannon.tools.generate_video import (
     clipcannon_generate_video,
     dispatch_generate_tool,
 )
+from clipcannon.tools.hrm_tools import (
+    HRM_TOOL_DEFINITIONS,
+    dispatch_hrm_tool,
+)
 from clipcannon.tools.voice import (
     dispatch_voice_tool,
 )
@@ -247,6 +251,8 @@ for _defs, _dispatch in [
     (VOICE_TOOL_DEFINITIONS, dispatch_voice_tool),
     (AVATAR_TOOL_DEFINITIONS, dispatch_avatar_tool),
     (GENERATE_TOOL_DEFINITIONS, dispatch_generate_tool),
+    # HRM bridge
+    (HRM_TOOL_DEFINITIONS, dispatch_hrm_tool),
 ]:
     for _tool_def in _defs:
         TOOL_DISPATCHERS[_tool_def.name] = _dispatch
@@ -268,6 +274,8 @@ ALL_TOOL_DEFINITIONS = (
     + VOICE_TOOL_DEFINITIONS
     + AVATAR_TOOL_DEFINITIONS
     + GENERATE_TOOL_DEFINITIONS
+    # HRM bridge
+    + HRM_TOOL_DEFINITIONS
 )
 
 __all__ = [
@@ -278,6 +286,7 @@ __all__ = [
     "DISCOVERY_TOOL_DEFINITIONS",
     "EDITING_TOOL_DEFINITIONS",
     "GENERATE_TOOL_DEFINITIONS",
+    "HRM_TOOL_DEFINITIONS",
     "RENDERING_TOOL_DEFINITIONS",
     "TOOL_DISPATCHERS",
     "UNDERSTANDING_TOOL_DEFINITIONS",
@@ -288,6 +297,7 @@ __all__ = [
     "dispatch_discovery_tool",
     "dispatch_editing_tool",
     "dispatch_generate_tool",
+    "dispatch_hrm_tool",
     "dispatch_rendering_tool",
     "dispatch_understanding_tool",
     "dispatch_voice_tool",

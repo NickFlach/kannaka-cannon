@@ -282,6 +282,27 @@ def _cleanup_temp_files(project_dir: Path) -> int:
     return cleaned
 
 
+async def _hrm_ingest_best_effort(project_id: str, db_path: Path) -> None:
+    """Store stem outputs into the HRM without ever failing the pipeline.
+
+    Guarded behind the kannaka binary being present; all errors are
+    swallowed so finalize (a REQUIRED stage) never breaks on HRM issues.
+
+    Args:
+        project_id: Project identifier.
+        db_path: Path to the project database.
+    """
+    try:
+        from clipcannon.hrm_bridge import hrm_available, ingest_project
+
+        if not hrm_available():
+            return
+        summary = await asyncio.to_thread(ingest_project, project_id, db_path)
+        logger.info("HRM ingest: %s", summary)
+    except Exception as exc:  # noqa: BLE001 - HRM is best-effort, never fatal
+        logger.warning("HRM ingest skipped for %s: %s", project_id, exc)
+
+
 async def run_finalize(
     project_id: str,
     db_path: Path,
@@ -386,6 +407,10 @@ async def run_finalize(
         )
         if cleaned > 0:
             logger.info("Cleaned up %d ephemeral files", cleaned)
+
+        # 5.5 Best-effort HRM ingest: store stem outputs as recallable
+        # memories. No-op if the kannaka binary is absent; never fatal.
+        await _hrm_ingest_best_effort(project_id, db_path)
 
         elapsed_ms = int((time.monotonic() - start_time) * 1000)
 
