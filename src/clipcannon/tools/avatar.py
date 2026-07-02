@@ -235,7 +235,6 @@ async def _handle_extract_webcam(
 
     src_w = int(source_info["width"])
     src_h = int(source_info["height"])
-    duration_ms = int(source_info["duration_ms"])
 
     # Get webcam/face region from scene_map
     region = _get_webcam_region(db_path, project_id)

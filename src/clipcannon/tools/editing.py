@@ -16,7 +16,7 @@ from copy import deepcopy
 
 from clipcannon.db.connection import get_connection
 from clipcannon.db.queries import execute, fetch_all, fetch_one
-from clipcannon.editing.change_classifier import RenderHint, classify_changes
+from clipcannon.editing.change_classifier import classify_changes
 from clipcannon.editing.edl import (
     CanvasSpec,
     ColorSpec,
