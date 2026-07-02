@@ -47,7 +47,7 @@ def _segments_match_by_id(
         return False
     return all(
         o.segment_id == n.segment_id
-        for o, n in zip(old_edl.segments, new_edl.segments)
+        for o, n in zip(old_edl.segments, new_edl.segments, strict=True)
     )
 
 
@@ -148,7 +148,7 @@ def classify_changes(
 
     # 6. Per-segment comparison (skip if already all-invalidated)
     if not hint.all_segments_invalidated:
-        for old_seg, new_seg in zip(old_edl.segments, new_edl.segments):
+        for old_seg, new_seg in zip(old_edl.segments, new_edl.segments, strict=True):
             sid = old_seg.segment_id
 
             if _timing_changed(old_seg, new_seg):
