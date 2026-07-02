@@ -8,6 +8,7 @@ charge credits.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 from pathlib import Path
@@ -335,16 +336,15 @@ async def clipcannon_find_best_moments(
                 elif position_ratio < 0.50:
                     adjusted_score *= 0.7
 
-            elif purpose == "tutorial_step":
+            elif purpose == "tutorial_step" and text_change_timestamps:
                 # Prefer highlights near text_change_events
-                if text_change_timestamps:
-                    min_dist = min(
-                        abs(h_mid - tce) for tce in text_change_timestamps
-                    )
-                    if min_dist <= 10_000:
-                        adjusted_score *= 1.3
-                    elif min_dist > 30_000:
-                        adjusted_score *= 0.7
+                min_dist = min(
+                    abs(h_mid - tce) for tce in text_change_timestamps
+                )
+                if min_dist <= 10_000:
+                    adjusted_score *= 1.3
+                elif min_dist > 30_000:
+                    adjusted_score *= 0.7
 
             # purpose == "highlight" uses raw scores (no adjustment)
 
@@ -775,7 +775,7 @@ async def clipcannon_find_cut_points(
         conn.close()
 
     # --- Cross-stream convergence scoring ---
-    CONVERGENCE_WINDOW_MS = 500
+    convergence_window_ms = 500
 
     # Group cut points into clusters by proximity
     cut_points.sort(key=lambda cp: cp["ms"])
@@ -785,7 +785,7 @@ async def clipcannon_find_cut_points(
     for cp in cut_points:
         if not current_cluster:
             current_cluster = [cp]
-        elif int(cp["ms"]) - int(current_cluster[0]["ms"]) <= CONVERGENCE_WINDOW_MS:
+        elif int(cp["ms"]) - int(current_cluster[0]["ms"]) <= convergence_window_ms:
             current_cluster.append(cp)
         else:
             clusters.append(current_cluster)
@@ -1310,27 +1310,23 @@ async def clipcannon_find_safe_cuts(
 
             # --- Words before the gap ---
             words_before_rows: list[dict[str, object]] = []
-            try:
+            with contextlib.suppress(Exception):
                 words_before_rows = fetch_all(
                     conn,
                     "SELECT word, end_ms, confidence FROM transcript_words "
                     "WHERE end_ms <= ? ORDER BY end_ms DESC LIMIT 3",
                     (gap_start + 100,),
                 )
-            except Exception:
-                pass
 
             # --- Words after the gap ---
             words_after_rows: list[dict[str, object]] = []
-            try:
+            with contextlib.suppress(Exception):
                 words_after_rows = fetch_all(
                     conn,
                     "SELECT word, start_ms, confidence FROM transcript_words "
                     "WHERE start_ms >= ? ORDER BY start_ms ASC LIMIT 3",
                     (gap_end - 100,),
                 )
-            except Exception:
-                pass
 
             words_before_text = " ".join(
                 str(w["word"]) for w in reversed(words_before_rows)
@@ -1441,9 +1437,8 @@ async def clipcannon_find_safe_cuts(
             cut_after_ms = gap_end + 50
 
             # Snap cut_before to nearest beat if aligned
-            if beat_aligned and nearest_beat is not None:
-                if nearest_beat <= gap_start:
-                    cut_before_ms = nearest_beat
+            if beat_aligned and nearest_beat is not None and nearest_beat <= gap_start:
+                cut_before_ms = nearest_beat
 
             # --- Build signals list ---
             signals: list[str] = ["silence_gap"]
