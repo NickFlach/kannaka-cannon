@@ -48,7 +48,7 @@ def _validate_inputs(prompt: str, duration_s: float, model_size: str) -> None:
         )
 
 
-def _crossfade_chunks(chunks: list, overlap_samples: int) -> "np.ndarray":  # noqa: F821
+def _crossfade_chunks(chunks: list, overlap_samples: int) -> np.ndarray:  # noqa: F821
     """Crossfade adjacent audio chunks with linear ramp at seams."""
     import numpy as np
 
@@ -70,7 +70,7 @@ def _crossfade_chunks(chunks: list, overlap_samples: int) -> "np.ndarray":  # no
     return result
 
 
-def _resample_to_44100(audio: "np.ndarray", src_sr: int) -> "np.ndarray":  # noqa: F821
+def _resample_to_44100(audio: np.ndarray, src_sr: int) -> np.ndarray:  # noqa: F821
     """Resample audio from src_sr to 44100Hz via linear interpolation."""
     import numpy as np
 
@@ -85,7 +85,7 @@ def _resample_to_44100(audio: "np.ndarray", src_sr: int) -> "np.ndarray":  # noq
     return audio[idx_floor] * (1.0 - frac) + audio[idx_ceil] * frac
 
 
-def _save_wav_mono(audio: "np.ndarray", path: Path, sample_rate: int) -> None:  # noqa: F821
+def _save_wav_mono(audio: np.ndarray, path: Path, sample_rate: int) -> None:  # noqa: F821
     """Save mono float32 audio as 16-bit WAV."""
     import numpy as np
 

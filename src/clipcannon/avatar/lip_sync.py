@@ -18,6 +18,7 @@ Requirements:
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import shutil
@@ -145,11 +146,10 @@ class LipSyncEngine:
         _add_latentsync_to_path()
 
         from diffusers import AutoencoderKL, DDIMScheduler
-        from omegaconf import OmegaConf
-
         from latentsync.models.unet import UNet3DConditionModel
         from latentsync.pipelines.lipsync_pipeline import LipsyncPipeline
         from latentsync.whisper.audio2feature import Audio2Feature
+        from omegaconf import OmegaConf
 
         logger.info("Loading LatentSync 1.6 pipeline...")
         start = time.monotonic()
@@ -384,10 +384,8 @@ class LipSyncEngine:
         import gc
 
         if self._deepcache_helper is not None:
-            try:
+            with contextlib.suppress(Exception):
                 self._deepcache_helper.disable()
-            except Exception:
-                pass
             self._deepcache_helper = None
 
         self._pipeline = None
