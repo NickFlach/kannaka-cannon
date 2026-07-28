@@ -9,6 +9,7 @@ topic label generation.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import time
@@ -585,18 +586,14 @@ async def run_semantic_embed(
         conn2 = get_connection(db_path, enable_vec=False, dict_rows=True)
         try:
             # Ensure sentiment columns exist (for pre-existing DBs)
-            try:
+            with contextlib.suppress(Exception):
                 conn2.execute(
                     "ALTER TABLE transcript_segments ADD COLUMN sentiment TEXT",
                 )
-            except Exception:
-                pass  # Column already exists
-            try:
+            with contextlib.suppress(Exception):
                 conn2.execute(
                     "ALTER TABLE transcript_segments ADD COLUMN sentiment_score REAL",
                 )
-            except Exception:
-                pass  # Column already exists
 
             for seg, sent in zip(segments, sentiments, strict=True):
                 execute(
