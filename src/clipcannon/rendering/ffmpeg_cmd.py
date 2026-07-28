@@ -308,10 +308,7 @@ def _build_multi_segment_cmd(
         # Video chain for this segment
         # Combine PTS reset + speed into one expression to avoid
         # an intermediate PTS rounding step.
-        if seg.speed != 1.0:
-            pts_expr = f"(PTS-STARTPTS)/{seg.speed}"
-        else:
-            pts_expr = "PTS-STARTPTS"
+        pts_expr = f"(PTS-STARTPTS)/{seg.speed}" if seg.speed != 1.0 else "PTS-STARTPTS"
 
         vchain = (
             f"[0:v]trim=start={start_s:.3f}:end={end_s:.3f},"

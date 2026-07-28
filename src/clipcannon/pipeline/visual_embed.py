@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import array
 import asyncio
+import contextlib
 import json
 import logging
 import os
@@ -323,10 +324,8 @@ if __name__ == "__main__":
     finally:
         # Clean up temp file
         if tmp_frame_list is not None:
-            try:
+            with contextlib.suppress(OSError):
                 os.unlink(tmp_frame_list.name)
-            except OSError:
-                pass
 
 
 def _detect_scenes(
