@@ -12,6 +12,7 @@ import logging
 import secrets
 import sqlite3 as _sqlite3
 from pathlib import Path
+
 from clipcannon.config import ClipCannonConfig
 from clipcannon.db.connection import get_connection
 from clipcannon.db.queries import execute, fetch_one

@@ -175,10 +175,10 @@ def _try_bnb_4bit(pipeline: Any) -> Any | None:
     installed or no conversion succeeds.
     """
     try:
+        from transformers import BitsAndBytesConfig  # type: ignore[import-untyped]
         from transformers.utils.bitsandbytes import (  # type: ignore[import-untyped]
             replace_with_bnb_linear,
         )
-        from transformers import BitsAndBytesConfig  # type: ignore[import-untyped]
     except ImportError:
         logger.info("offload: bitsandbytes/transformers not installed; skipping 4-bit")
         return None

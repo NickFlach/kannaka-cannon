@@ -534,6 +534,7 @@ async def _transcribe_faster_whisper(
 
         del model
         import gc
+
         import torch
 
         gc.collect()
