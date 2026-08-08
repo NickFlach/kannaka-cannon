@@ -74,6 +74,22 @@ def generate_lyrics(
         the ask fails. Caller should treat empty as "no lyrics; let the
         music model improvise."
     """
+    # Primary path: the writers-room (claude CLI headless + local HRM
+    # recall + draft/revise). Falls through to the legacy single-shot
+    # path only if the writer produces nothing.
+    try:
+        from .lyric_writer import generate_lyrics as _writer
+        text = _writer(
+            title=title, theme=theme, recall_query=recall_query,
+            bars=bars, structure=structure, voice_note=voice_note,
+            timeout_sec=timeout_sec,
+        )
+        if text:
+            return text
+        logger.warning("hrm_lyrics: lyric_writer returned empty for %r — legacy path", title)
+    except Exception as exc:
+        logger.warning("hrm_lyrics: lyric_writer failed (%s) — legacy path", exc)
+
     binary = kannaka_bin or _find_kannaka()
     if not binary:
         logger.info("hrm_lyrics: kannaka binary not found; returning empty lyrics")
