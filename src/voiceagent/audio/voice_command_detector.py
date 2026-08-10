@@ -14,8 +14,10 @@ import logging
 import os
 import re
 import signal
-from collections.abc import Callable, Coroutine
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Coroutine
 
 import numpy as np
 from pipecat.frames.frames import (
@@ -146,7 +148,7 @@ class VoiceCommandDetector(FrameProcessor):
 
         best_score = 0.0
         best_voice = None
-        for cmd, data in self._embeddings.items():
+        for _, data in self._embeddings.items():
             score = float(np.dot(query_emb, data["embedding"]))
             if score > best_score:
                 best_score = score
@@ -251,12 +253,13 @@ class SleepCommandDetector(FrameProcessor):
     ) -> None:
         await super().process_frame(frame, direction)
 
-        if direction == FrameDirection.DOWNSTREAM and isinstance(
-            frame, TranscriptionFrame,
+        if (
+            direction == FrameDirection.DOWNSTREAM
+            and isinstance(frame, TranscriptionFrame)
+            and self._is_sleep_command(frame.text)
         ):
-            if self._is_sleep_command(frame.text):
-                logger.info("Shutting down voice agent...")
-                os.kill(os.getpid(), signal.SIGTERM)
-                return
+            logger.info("Shutting down voice agent...")
+            os.kill(os.getpid(), signal.SIGTERM)
+            return
 
         await self.push_frame(frame, direction)
