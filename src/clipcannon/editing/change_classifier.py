@@ -9,9 +9,12 @@ Pure functions -- no DB access, no side effects.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, Field
 
-from clipcannon.editing.edl import EditDecisionList, SegmentSpec
+if TYPE_CHECKING:
+    from clipcannon.editing.edl import EditDecisionList, SegmentSpec
 
 
 class RenderHint(BaseModel):

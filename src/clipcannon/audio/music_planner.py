@@ -156,11 +156,7 @@ def _aggregate_emotions(
     avg_valence = total_valence / len(rows)
     avg_arousal = total_arousal / len(rows)
 
-    if counts:
-        dominant = max(counts, key=counts.get)  # type: ignore[arg-type]
-    else:
-        # No dominant_emotion column -- classify from valence/arousal
-        dominant = ""  # Will be classified by _classify_mood
+    dominant = max(counts, key=counts.get) if counts else ""  # type: ignore[arg-type]
 
     return dominant, avg_valence, avg_arousal
 
