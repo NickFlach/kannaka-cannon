@@ -279,15 +279,16 @@ emb_array = (emb_array / norms).tolist()
 json.dump(emb_array, sys.stdout)
 '''
 
-    tmp_texts = tempfile.NamedTemporaryFile(
-        mode="w", suffix=".json", prefix="nomic_texts_", delete=False,
-    )
+    tmp_name: str | None = None
     try:
-        json.dump(texts, tmp_texts)
-        tmp_texts.close()
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", prefix="nomic_texts_", delete=False,
+        ) as tmp_texts:
+            tmp_name = tmp_texts.name
+            json.dump(texts, tmp_texts)
 
         proc = subprocess.run(
-            ["python3", "-c", worker_script, tmp_texts.name, MODEL_ID],
+            ["python3", "-c", worker_script, tmp_name, MODEL_ID],
             capture_output=True,
             text=True,
             timeout=300,
@@ -304,8 +305,9 @@ json.dump(emb_array, sys.stdout)
         logger.info("Computed %d semantic embeddings via subprocess", len(emb_array))
 
     finally:
-        import os
-        os.unlink(tmp_texts.name)
+        if tmp_name is not None:
+            import os
+            os.unlink(tmp_name)
 
     return emb_array
 

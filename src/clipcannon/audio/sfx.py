@@ -335,10 +335,7 @@ def _gen_nature_bed(duration_ms: int, _params: dict[str, object]) -> np.ndarray:
     nyq = SAMPLE_RATE / 2.0
     lo, hi = 200.0 / nyq, min(2000.0 / nyq, 0.99)
     white = rng.standard_normal(n)
-    if lo < hi:
-        filtered = sosfilt(butter(4, [lo, hi], btype="band", output="sos"), white)
-    else:
-        filtered = white
+    filtered = sosfilt(butter(4, [lo, hi], btype="band", output="sos"), white) if lo < hi else white
     signal = pink + 0.3 * filtered
     # Gentle 10% fade in/out
     fl = max(int(n * 0.1), 1)
