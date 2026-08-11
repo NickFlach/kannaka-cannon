@@ -257,17 +257,17 @@ if __name__ == "__main__":
 '''
 
     # Write frame paths to a temp file to avoid command-line length limits
-    tmp_frame_list = None
+    tmp_path: str | None = None
     try:
-        tmp_frame_list = tempfile.NamedTemporaryFile(
+        with tempfile.NamedTemporaryFile(
             mode="w",
             suffix=".txt",
             prefix="siglip_frames_",
             delete=False,
-        )
-        for fp in frame_paths:
-            tmp_frame_list.write(f"{fp}\n")
-        tmp_frame_list.close()
+        ) as tmp_frame_list:
+            tmp_path = tmp_frame_list.name
+            for fp in frame_paths:
+                tmp_frame_list.write(f"{fp}\n")
 
         # Build environment for subprocess
         env = os.environ.copy()
@@ -285,7 +285,7 @@ if __name__ == "__main__":
         proc = subprocess.run(
             [
                 "python3", "-c", worker_script,
-                tmp_frame_list.name,
+                tmp_path,
                 device,
                 str(subprocess_batch_size),
                 SIGLIP_MODEL_ID,
@@ -323,9 +323,9 @@ if __name__ == "__main__":
 
     finally:
         # Clean up temp file
-        if tmp_frame_list is not None:
+        if tmp_path is not None:
             with contextlib.suppress(OSError):
-                os.unlink(tmp_frame_list.name)
+                os.unlink(tmp_path)
 
 
 def _detect_scenes(
